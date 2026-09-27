@@ -209,6 +209,8 @@ main {
 .overlay-card h2 { margin: 0 0 0.5rem; font-size: 2rem; color: #7dd3fc; }
 .overlay-card p { color: #cbd5e1; }
 
+[hidden] { display: none !important; }
+
 #overlay-btn {
   margin-top: 1rem;
   padding: 0.6rem 2rem;
