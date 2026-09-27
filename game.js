@@ -226,6 +226,106 @@
     }
   }
 
+  function renderShipCells(board, grid, shipIndex) {
+    for (const { row, col } of board.ships[shipIndex].cells) {
+      const cell = cellAt(grid, row, col);
+      cell.classList.remove('hit');
+      cell.classList.add('sunk');
+    }
+  }
+
+  function paintShot(board, grid, row, col, res) {
+    const cell = cellAt(grid, row, col);
+    cell.classList.add('fired');
+    if (res.result === 'miss') {
+      cell.classList.add('miss');
+    } else if (res.result === 'hit') {
+      cell.classList.add('hit');
+    } else {
+      renderShipCells(board, grid, res.shipIndex);
+    }
+  }
+
+  function aiPickShot() {
+    const board = state.playerBoard;
+    const options = [];
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        if (!board.cells[r][c].hit) options.push({ row: r, col: c });
+      }
+    }
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
+  function aiFire() {
+    const { row, col } = aiPickShot();
+    const res = B.fireAt(state.playerBoard, row, col);
+    state.stats.aiShots++;
+    paintShot(state.playerBoard, playerGrid, row, col, res);
+    const at = B.coord(row, col);
+    if (res.result === 'miss') {
+      log(`The AI missed at ${at}`, 'ai');
+    } else if (res.result === 'hit') {
+      log(`The AI hit your ${res.shipName} at ${at}`, 'ai');
+    } else {
+      log(`The AI sank your ${res.shipName}!`, 'ai');
+    }
+    if (B.allSunk(state.playerBoard)) {
+      endGame(false);
+      return;
+    }
+    state.aiLock = false;
+    setStatus('Your turn — fire at Enemy Waters.');
+  }
+
+  function onEnemyCellClick(e) {
+    const cell = e.target.closest('.cell');
+    if (!cell || state.phase !== 'play' || state.aiLock) return;
+    const row = +cell.dataset.row;
+    const col = +cell.dataset.col;
+    if (state.enemyBoard.cells[row][col].hit) return;
+    const res = B.fireAt(state.enemyBoard, row, col);
+    state.stats.playerShots++;
+    paintShot(state.enemyBoard, enemyGrid, row, col, res);
+    const at = B.coord(row, col);
+    if (res.result === 'miss') {
+      log(`You missed at ${at}`, 'player');
+    } else if (res.result === 'hit') {
+      log(`You hit the ${res.shipName} at ${at}`, 'player');
+    } else {
+      log(`You sank the AI's ${res.shipName}!`, 'player');
+    }
+    if (B.allSunk(state.enemyBoard)) {
+      endGame(true);
+      return;
+    }
+    state.aiLock = true;
+    enemyGrid.classList.add('locked');
+    setStatus('AI is thinking…');
+    setTimeout(() => {
+      enemyGrid.classList.remove('locked');
+      aiFire();
+    }, 500);
+  }
+
+  function endGame(playerWon) {
+    state.phase = 'over';
+    setStatus(playerWon ? 'You win!' : 'The AI wins!');
+    log(playerWon ? 'You win!' : 'The AI wins!', 'info');
+  }
+
+  function startGame() {
+    state.phase = 'play';
+    B.randomFleet(state.enemyBoard);
+    $('start-btn').hidden = true;
+    $('rotate-btn').disabled = true;
+    $('random-btn').disabled = true;
+    $('reset-btn').disabled = true;
+    clearPreview();
+    setStatus('Your turn — fire at Enemy Waters.');
+    log('Game started. Good luck!', 'info');
+  }
+
   function updateSetupStatus() {
     if (state.nextShip < SHIPS.length) {
       setStatus(`Place your ${SHIPS[state.nextShip].name} (${SHIPS[state.nextShip].size} cells) — ${orientationWord()}, press R to rotate`);
@@ -304,6 +404,8 @@
       log('Fleet placed randomly.', 'info');
     });
     $('reset-btn').addEventListener('click', resetPlacement);
+    $('start-btn').addEventListener('click', startGame);
+    enemyGrid.addEventListener('click', onEnemyCellClick);
     document.addEventListener('keydown', e => {
       if ((e.key === 'r' || e.key === 'R') && state.phase === 'setup') toggleRotate();
     });
