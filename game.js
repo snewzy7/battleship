@@ -119,3 +119,197 @@
   root.Battleship = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
+
+// ---- UI ----
+(function () {
+  if (typeof document === 'undefined') return;
+  const B = window.Battleship;
+  const { SIZE, COLS, SHIPS } = B;
+
+  const state = {
+    phase: 'setup', // 'setup' | 'play' | 'over'
+    playerBoard: B.createBoard(),
+    enemyBoard: B.createBoard(),
+    orientation: 'h',
+    nextShip: 0,
+    aiLock: false,
+    stats: { playerShots: 0, aiShots: 0 },
+  };
+
+  const $ = id => document.getElementById(id);
+  const statusEl = $('status');
+  const playerGrid = $('player-grid');
+  const enemyGrid = $('enemy-grid');
+  const logEl = $('log');
+
+  function buildLabels(colId, rowId) {
+    const colEl = $(colId);
+    const rowEl = $(rowId);
+    for (let c = 0; c < SIZE; c++) {
+      const s = document.createElement('span');
+      s.textContent = COLS[c];
+      colEl.appendChild(s);
+    }
+    for (let r = 0; r < SIZE; r++) {
+      const s = document.createElement('span');
+      s.textContent = r + 1;
+      rowEl.appendChild(s);
+    }
+  }
+
+  function buildGrid(grid) {
+    grid.textContent = '';
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.row = r;
+        cell.dataset.col = c;
+        grid.appendChild(cell);
+      }
+    }
+  }
+
+  function cellAt(grid, r, c) {
+    return grid.children[r * SIZE + c];
+  }
+
+  function log(text, cls) {
+    const li = document.createElement('li');
+    li.textContent = text;
+    li.className = cls || 'info';
+    logEl.prepend(li);
+  }
+
+  function setStatus(text) {
+    statusEl.textContent = text;
+  }
+
+  function orientationWord() {
+    return state.orientation === 'h' ? 'horizontally' : 'vertically';
+  }
+
+  function renderPlayerBoard() {
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = cellAt(playerGrid, r, c);
+        cell.classList.toggle('ship', state.playerBoard.cells[r][c].ship !== null);
+      }
+    }
+  }
+
+  function shipCells(shipIndex, row, col) {
+    const cells = [];
+    const dr = state.orientation === 'v' ? 1 : 0;
+    const dc = state.orientation === 'h' ? 1 : 0;
+    for (let i = 0; i < SHIPS[shipIndex].size; i++) {
+      cells.push({ r: row + dr * i, c: col + dc * i });
+    }
+    return cells;
+  }
+
+  function clearPreview() {
+    for (const cell of playerGrid.children) {
+      cell.classList.remove('preview-valid', 'preview-invalid');
+    }
+  }
+
+  function previewAt(row, col) {
+    clearPreview();
+    if (state.phase !== 'setup' || state.nextShip >= SHIPS.length) return;
+    const cls = B.canPlace(state.playerBoard, state.nextShip, row, col, state.orientation).ok
+      ? 'preview-valid' : 'preview-invalid';
+    for (const { r, c } of shipCells(state.nextShip, row, col)) {
+      if (r >= 0 && r < SIZE && c >= 0 && c < SIZE) {
+        cellAt(playerGrid, r, c).classList.add(cls);
+      }
+    }
+  }
+
+  function updateSetupStatus() {
+    if (state.nextShip < SHIPS.length) {
+      setStatus(`Place your ${SHIPS[state.nextShip].name} (${SHIPS[state.nextShip].size} cells) — ${orientationWord()}, press R to rotate`);
+    } else {
+      setStatus('All ships placed. Start the game!');
+    }
+  }
+
+  function failPlacement(row, col, check) {
+    const name = SHIPS[state.nextShip].name;
+    const at = B.coord(row, col);
+    const msg = check.reason === 'edge'
+      ? `Can't place ${name} at ${at} ${orientationWord()}: it would extend past the edge`
+      : `Can't place ${name} at ${at} ${orientationWord()}: it overlaps the ${check.overlapName}`;
+    setStatus(msg);
+    log(msg, 'info');
+  }
+
+  function onPlayerCellClick(e) {
+    const cell = e.target.closest('.cell');
+    if (!cell || state.phase !== 'setup' || state.nextShip >= SHIPS.length) return;
+    const row = +cell.dataset.row;
+    const col = +cell.dataset.col;
+    const res = B.placeShip(state.playerBoard, state.nextShip, row, col, state.orientation);
+    if (!res.ok) {
+      failPlacement(row, col, res);
+      return;
+    }
+    log(`Placed ${SHIPS[state.nextShip].name} at ${B.coord(row, col)}`, 'info');
+    state.nextShip++;
+    renderPlayerBoard();
+    clearPreview();
+    previewAt(row, col);
+    updateSetupStatus();
+    $('start-btn').hidden = state.nextShip < SHIPS.length;
+  }
+
+  function onPlayerCellHover(e) {
+    const cell = e.target.closest('.cell');
+    if (!cell) return;
+    previewAt(+cell.dataset.row, +cell.dataset.col);
+  }
+
+  function resetPlacement() {
+    B.clearBoard(state.playerBoard);
+    state.nextShip = 0;
+    renderPlayerBoard();
+    clearPreview();
+    updateSetupStatus();
+    $('start-btn').hidden = true;
+  }
+
+  function toggleRotate() {
+    state.orientation = state.orientation === 'h' ? 'v' : 'h';
+    $('rotate-btn').textContent = `Rotate (${state.orientation.toUpperCase()})`;
+    updateSetupStatus();
+  }
+
+  function init() {
+    buildLabels('player-col-labels', 'player-row-labels');
+    buildLabels('enemy-col-labels', 'enemy-row-labels');
+    buildGrid(playerGrid);
+    buildGrid(enemyGrid);
+
+    playerGrid.addEventListener('click', onPlayerCellClick);
+    playerGrid.addEventListener('mouseover', onPlayerCellHover);
+    playerGrid.addEventListener('mouseleave', clearPreview);
+    $('rotate-btn').addEventListener('click', toggleRotate);
+    $('random-btn').addEventListener('click', () => {
+      B.randomFleet(state.playerBoard);
+      state.nextShip = SHIPS.length;
+      renderPlayerBoard();
+      clearPreview();
+      updateSetupStatus();
+      $('start-btn').hidden = false;
+      log('Fleet placed randomly.', 'info');
+    });
+    $('reset-btn').addEventListener('click', resetPlacement);
+    document.addEventListener('keydown', e => {
+      if ((e.key === 'r' || e.key === 'R') && state.phase === 'setup') toggleRotate();
+    });
+
+    updateSetupStatus();
+  }
+
+  init();
+})();
