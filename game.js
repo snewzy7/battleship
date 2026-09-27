@@ -195,11 +195,24 @@
     return state.orientation === 'h' ? 'horizontally' : 'vertically';
   }
 
+  function shipShapeClasses(ship, row, col) {
+    const horizontal = ship.cells.every(c => c.row === ship.cells[0].row);
+    const i = ship.cells.findIndex(c => c.row === row && c.col === col);
+    let pos = 'ship-mid';
+    if (i === 0) pos = 'ship-bow';
+    else if (i === ship.cells.length - 1) pos = 'ship-stern';
+    return ['ship', horizontal ? 'ship-h' : 'ship-v', pos];
+  }
+
   function renderPlayerBoard() {
     for (let r = 0; r < SIZE; r++) {
       for (let c = 0; c < SIZE; c++) {
         const cell = cellAt(playerGrid, r, c);
-        cell.classList.toggle('ship', state.playerBoard.cells[r][c].ship !== null);
+        cell.classList.remove('ship', 'ship-h', 'ship-v', 'ship-bow', 'ship-stern', 'ship-mid');
+        const idx = state.playerBoard.cells[r][c].ship;
+        if (idx !== null) {
+          cell.classList.add(...shipShapeClasses(state.playerBoard.ships[idx], r, c));
+        }
       }
     }
   }
@@ -268,10 +281,11 @@
   }
 
   function renderShipCells(board, grid, shipIndex) {
-    for (const { row, col } of board.ships[shipIndex].cells) {
+    const ship = board.ships[shipIndex];
+    for (const { row, col } of ship.cells) {
       const cell = cellAt(grid, row, col);
       cell.classList.remove('hit');
-      cell.classList.add('sunk');
+      cell.classList.add('sunk', ...shipShapeClasses(ship, row, col));
     }
   }
 

@@ -30,9 +30,13 @@ No dependencies to install.
    - `Reset placement` clears the board.
 2. Click **Start game** once all five ships are placed.
 3. **Battle** — click cells in *Enemy Waters* to fire. Hits are orange,
-   misses blue, sunk ships red. You and the AI alternate shots; the AI fires
-   about half a second after you.
-4. The game ends when all five ships on one side are sunk. Click **Play again**
+   misses blue, sunk ships red. You and the AI alternate shots; the AI takes
+   a beat (about 1.4s, longer after a hit) before returning fire, with boom,
+   shake and flash effects on hits and sinkings.
+4. The side panel shows a per-player dashboard: each fleet's ships with
+   damage pips plus shots/hits/accuracy, a "Command" controls box, and the
+   battle log (blue = you, red = AI).
+5. The game ends when all five ships on one side are sunk. Click **Play again**
    to restart.
 
 Ships: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).

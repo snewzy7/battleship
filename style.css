@@ -101,7 +101,31 @@ main {
 #enemy-grid.locked .cell { cursor: not-allowed; }
 #enemy-grid .cell.fired { cursor: not-allowed; }
 
-.cell.ship { background: #64748b; }
+.cell.ship {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+}
+.cell.ship-h { border-radius: 2px; }
+.cell.ship-v { border-radius: 2px; }
+.cell.ship-h.ship-bow  { border-radius: 50% 2px 2px 50%; }
+.cell.ship-h.ship-stern { border-radius: 2px 50% 50% 2px; }
+.cell.ship-v.ship-bow  { border-radius: 50% 50% 2px 2px; }
+.cell.ship-v.ship-stern { border-radius: 2px 2px 50% 50%; }
+.cell.ship.ship-mid::before {
+  content: "";
+  position: absolute;
+  inset: 38%;
+  border-radius: 50%;
+  background: #cbd5e1;
+}
+.cell.ship-h:not(.ship-stern) { box-shadow: 2px 0 0 #7c8a9e; }
+.cell.ship-v:not(.ship-stern) { box-shadow: 0 2px 0 #7c8a9e; }
+.cell.ship.sunk {
+  background: linear-gradient(135deg, #7f1d1d, #450a0a);
+}
+.cell.ship.sunk.ship-h.ship-bow  { border-radius: 50% 2px 2px 50%; }
+.cell.ship.sunk.ship-h.ship-stern { border-radius: 2px 50% 50% 2px; }
+.cell.ship.sunk.ship-v.ship-bow  { border-radius: 50% 50% 2px 2px; }
+.cell.ship.sunk.ship-v.ship-stern { border-radius: 2px 2px 50% 50%; }
 .cell.preview-valid { background: #22c55e; }
 .cell.preview-invalid { background: #ef4444; }
 .cell.miss { background: #164e63; position: relative; }
