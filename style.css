@@ -1,0 +1,225 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: #0f172a;
+  color: #e2e8f0;
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  padding: 1rem 1rem 0.5rem;
+}
+
+header h1 {
+  margin: 0;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #7dd3fc;
+}
+
+#status {
+  margin: 0.5rem 0 0;
+  font-size: 1.05rem;
+  min-height: 1.4em;
+  color: #fbbf24;
+}
+
+main {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.boards {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.board-wrap h2, .side h2 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin: 0 0 0.5rem;
+}
+
+.grid-outer {
+  display: grid;
+  grid-template-columns: 1.4em auto;
+  grid-template-rows: 1.4em auto;
+  gap: 2px;
+}
+
+.corner { grid-area: 1 / 1; }
+.col-labels {
+  grid-area: 1 / 2;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+}
+.row-labels {
+  grid-area: 2 / 1;
+  display: grid;
+  grid-template-rows: repeat(10, 1fr);
+}
+.col-labels span, .row-labels span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.grid {
+  grid-area: 2 / 2;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  background: #1e293b;
+  padding: 2px;
+  border-radius: 6px;
+  width: min(42vw, 380px);
+  aspect-ratio: 1 / 1;
+}
+
+.cell {
+  background: #0c4a6e;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.cell:hover { background: #075985; }
+
+#enemy-grid.locked .cell { cursor: not-allowed; }
+#enemy-grid .cell.fired { cursor: not-allowed; }
+
+.cell.ship { background: #64748b; }
+.cell.preview-valid { background: #22c55e; }
+.cell.preview-invalid { background: #ef4444; }
+.cell.miss { background: #164e63; position: relative; }
+.cell.miss::after {
+  content: "";
+  position: absolute;
+  inset: 35%;
+  border-radius: 50%;
+  background: #bae6fd;
+}
+.cell { position: relative; }
+.cell.hit { background: #f97316; }
+.cell.hit::after {
+  content: "";
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: #7f1d1d;
+}
+.cell.sunk { background: #dc2626; }
+.cell.sunk::after {
+  content: "";
+  position: absolute;
+  inset: 30%;
+  border-radius: 50%;
+  background: #450a0a;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 280px;
+  max-width: 100%;
+}
+
+.controls {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 0.75rem 1rem 1rem;
+}
+
+.controls button {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.55rem;
+  border: none;
+  border-radius: 6px;
+  background: #0369a1;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.controls button:hover { background: #0284c7; }
+.controls button:disabled { background: #334155; cursor: not-allowed; }
+#start-btn, #restart-btn, #overlay-btn { background: #15803d; }
+#start-btn:hover, #restart-btn:hover, #overlay-btn:hover { background: #16a34a; }
+
+.log-panel {
+  background: #1e293b;
+  border-radius: 8px;
+  padding: 0.75rem 1rem 1rem;
+  flex: 1;
+}
+
+#log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+#log li {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+
+#log li.player { background: #0c4a6e; color: #bae6fd; }
+#log li.ai { background: #3f1d1d; color: #fecaca; }
+#log li.info { background: #292524; color: #d6d3d1; }
+
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.overlay-card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 2rem 3rem;
+  text-align: center;
+}
+
+.overlay-card h2 { margin: 0 0 0.5rem; font-size: 2rem; color: #7dd3fc; }
+.overlay-card p { color: #cbd5e1; }
+
+#overlay-btn {
+  margin-top: 1rem;
+  padding: 0.6rem 2rem;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .grid { width: min(88vw, 380px); }
+  .side { width: min(88vw, 380px); }
+}

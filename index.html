@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battleship</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Battleship</h1>
+    <p id="status">Place your ships to begin.</p>
+  </header>
+
+  <main>
+    <section class="boards">
+      <div class="board-wrap">
+        <h2>Your Fleet</h2>
+        <div class="grid-outer">
+          <div class="corner"></div>
+          <div class="col-labels" id="player-col-labels"></div>
+          <div class="row-labels" id="player-row-labels"></div>
+          <div class="grid" id="player-grid"></div>
+        </div>
+      </div>
+      <div class="board-wrap">
+        <h2>Enemy Waters</h2>
+        <div class="grid-outer">
+          <div class="corner"></div>
+          <div class="col-labels" id="enemy-col-labels"></div>
+          <div class="row-labels" id="enemy-row-labels"></div>
+          <div class="grid" id="enemy-grid"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="controls">
+        <h2>Controls</h2>
+        <button id="rotate-btn" type="button">Rotate (H)</button>
+        <button id="random-btn" type="button">Place randomly</button>
+        <button id="reset-btn" type="button">Reset placement</button>
+        <button id="start-btn" type="button" hidden>Start game</button>
+        <button id="restart-btn" type="button" hidden>Play again</button>
+      </section>
+
+      <section class="log-panel">
+        <h2>Battle Log</h2>
+        <ul id="log"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <div id="overlay" hidden>
+    <div class="overlay-card">
+      <h2 id="overlay-title"></h2>
+      <p id="overlay-summary"></p>
+      <button id="overlay-btn" type="button">Play again</button>
+    </div>
+  </div>
+
+  <script src="ai.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
