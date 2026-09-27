@@ -263,10 +263,11 @@
       name.textContent = ship.name;
       const pips = document.createElement('span');
       pips.className = 'pips';
-      for (const c of ship.cells.length ? ship.cells : Array.from({ length: ship.size })) {
+      for (let i = 0; i < ship.size; i++) {
+        const c = ship.cells[i];
         const pip = document.createElement('span');
         pip.className = 'pip';
-        if (c.row !== undefined && board.cells[c.row][c.col].hit) pip.classList.add('hit');
+        if (c && board.cells[c.row][c.col].hit) pip.classList.add('hit');
         pips.appendChild(pip);
       }
       const stateEl = document.createElement('span');
