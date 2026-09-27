@@ -3,7 +3,7 @@
 A browser Battleship game: human vs AI on two 10x10 grids. Plain HTML/CSS/JS —
 no build step, no framework, no backend.
 
-Live demo: (URL to be added)
+Live demo: https://snewzy7.github.io/battleship/
 
 ## Run locally
 
