@@ -303,6 +303,34 @@
     state.phase = 'over';
     setStatus(playerWon ? 'You win!' : 'The AI wins!');
     log(playerWon ? 'You win!' : 'The AI wins!', 'info');
+    $('overlay-title').textContent = playerWon ? 'You win!' : 'The AI wins!';
+    $('overlay-summary').textContent =
+      `You fired ${state.stats.playerShots} shots; the AI fired ${state.stats.aiShots}.`;
+    $('overlay').hidden = false;
+    $('restart-btn').hidden = false;
+  }
+
+  function restartGame() {
+    state.phase = 'setup';
+    state.playerBoard = B.createBoard();
+    state.enemyBoard = B.createBoard();
+    state.orientation = 'h';
+    state.nextShip = 0;
+    state.aiLock = false;
+    state.ai = null;
+    state.stats = { playerShots: 0, aiShots: 0 };
+    buildGrid(playerGrid);
+    buildGrid(enemyGrid);
+    logEl.textContent = '';
+    $('overlay').hidden = true;
+    $('restart-btn').hidden = true;
+    $('start-btn').hidden = true;
+    $('rotate-btn').disabled = false;
+    $('rotate-btn').textContent = 'Rotate (H)';
+    $('random-btn').disabled = false;
+    $('reset-btn').disabled = false;
+    enemyGrid.classList.remove('locked');
+    updateSetupStatus();
   }
 
   function startGame() {
@@ -398,6 +426,8 @@
     $('reset-btn').addEventListener('click', resetPlacement);
     $('start-btn').addEventListener('click', startGame);
     enemyGrid.addEventListener('click', onEnemyCellClick);
+    $('restart-btn').addEventListener('click', restartGame);
+    $('overlay-btn').addEventListener('click', restartGame);
     document.addEventListener('keydown', e => {
       if ((e.key === 'r' || e.key === 'R') && state.phase === 'setup') toggleRotate();
     });
