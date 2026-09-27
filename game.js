@@ -240,15 +240,51 @@
     }
   }
 
+  function boom(cell) {
+    cell.classList.add('boom');
+    cell.addEventListener('animationend', () => cell.classList.remove('boom'), { once: true });
+  }
+
+  function statusPulse() {
+    statusEl.classList.remove('status-hit');
+    void statusEl.offsetWidth;
+    statusEl.classList.add('status-hit');
+    statusEl.addEventListener('animationend', () => statusEl.classList.remove('status-hit'), { once: true });
+  }
+
+  function flashScreen(kind) {
+    const flash = $('flash');
+    flash.className = '';
+    void flash.offsetWidth;
+    flash.classList.add('on', kind);
+    flash.addEventListener('animationend', () => { flash.className = ''; }, { once: true });
+  }
+
+  function shakeBoard(grid) {
+    const wrap = grid.closest('.board-wrap');
+    if (!wrap) return;
+    wrap.classList.add('shake');
+    wrap.addEventListener('animationend', () => wrap.classList.remove('shake'), { once: true });
+  }
+
   function paintShot(board, grid, row, col, res) {
     const cell = cellAt(grid, row, col);
     cell.classList.add('fired');
     if (res.result === 'miss') {
-      cell.classList.add('miss');
+      cell.classList.add('miss', 'splash');
+      cell.addEventListener('animationend', () => cell.classList.remove('splash'), { once: true });
     } else if (res.result === 'hit') {
       cell.classList.add('hit');
+      boom(cell);
+      statusPulse();
     } else {
       renderShipCells(board, grid, res.shipIndex);
+      board.ships[res.shipIndex].cells.forEach(({ row: r, col: c }, i) => {
+        setTimeout(() => boom(cellAt(grid, r, c)), i * 80);
+      });
+      shakeBoard(grid);
+      flashScreen(grid === enemyGrid ? 'gold' : 'red');
+      statusPulse();
     }
   }
 
