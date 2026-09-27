@@ -133,6 +133,7 @@
     orientation: 'h',
     nextShip: 0,
     aiLock: false,
+    ai: null,
     stats: { playerShots: 0, aiShots: 0 },
   };
 
@@ -246,20 +247,10 @@
     }
   }
 
-  function aiPickShot() {
-    const board = state.playerBoard;
-    const options = [];
-    for (let r = 0; r < SIZE; r++) {
-      for (let c = 0; c < SIZE; c++) {
-        if (!board.cells[r][c].hit) options.push({ row: r, col: c });
-      }
-    }
-    return options[Math.floor(Math.random() * options.length)];
-  }
-
   function aiFire() {
-    const { row, col } = aiPickShot();
+    const { row, col } = window.BattleshipAI.chooseShot(state.ai);
     const res = B.fireAt(state.playerBoard, row, col);
+    window.BattleshipAI.notifyResult(state.ai, row, col, res);
     state.stats.aiShots++;
     paintShot(state.playerBoard, playerGrid, row, col, res);
     const at = B.coord(row, col);
@@ -316,6 +307,7 @@
 
   function startGame() {
     state.phase = 'play';
+    state.ai = window.BattleshipAI.createAI();
     B.randomFleet(state.enemyBoard);
     $('start-btn').hidden = true;
     $('rotate-btn').disabled = true;
