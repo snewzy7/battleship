@@ -126,6 +126,10 @@
   const B = window.Battleship;
   const { SIZE, COLS, SHIPS } = B;
 
+  const AI_DELAY = 1400;
+  const POST_AI_DELAY = 900;
+  const HIT_PAUSE = 600;
+
   const state = {
     phase: 'setup', // 'setup' | 'play' | 'over'
     playerBoard: B.createBoard(),
@@ -135,6 +139,7 @@
     aiLock: false,
     ai: null,
     stats: { playerShots: 0, aiShots: 0 },
+    timeouts: [],
   };
 
   const $ = id => document.getElementById(id);
@@ -263,10 +268,7 @@
     }
     if (B.allSunk(state.playerBoard)) {
       endGame(false);
-      return;
     }
-    state.aiLock = false;
-    setStatus('Your turn — fire at Enemy Waters.');
   }
 
   function onEnemyCellClick(e) {
@@ -292,11 +294,17 @@
     }
     state.aiLock = true;
     enemyGrid.classList.add('locked');
-    setStatus('AI is thinking…');
-    setTimeout(() => {
-      enemyGrid.classList.remove('locked');
+    setStatus('Enemy shot incoming…');
+    const wait = AI_DELAY + (res.result === 'miss' ? 0 : HIT_PAUSE);
+    state.timeouts.push(setTimeout(() => {
       aiFire();
-    }, 500);
+      if (state.phase !== 'play') return;
+      state.timeouts.push(setTimeout(() => {
+        enemyGrid.classList.remove('locked');
+        state.aiLock = false;
+        setStatus('Your turn — fire at Enemy Waters.');
+      }, POST_AI_DELAY));
+    }, wait));
   }
 
   function endGame(playerWon) {
@@ -319,6 +327,8 @@
     state.aiLock = false;
     state.ai = null;
     state.stats = { playerShots: 0, aiShots: 0 };
+    state.timeouts.forEach(clearTimeout);
+    state.timeouts = [];
     buildGrid(playerGrid);
     buildGrid(enemyGrid);
     logEl.textContent = '';
