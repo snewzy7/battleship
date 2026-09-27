@@ -138,7 +138,7 @@
     nextShip: 0,
     aiLock: false,
     ai: null,
-    stats: { playerShots: 0, aiShots: 0 },
+    stats: { playerShots: 0, playerHits: 0, aiShots: 0, aiHits: 0 },
     timeouts: [],
   };
 
@@ -232,6 +232,41 @@
     }
   }
 
+  function renderFleetPanels() {
+    renderFleetPanel($('player-fleet'), state.playerBoard,
+      state.stats.aiShots, state.stats.aiHits);
+    renderFleetPanel($('enemy-fleet'), state.enemyBoard,
+      state.stats.playerShots, state.stats.playerHits);
+  }
+
+  function renderFleetPanel(panel, board, shots, hits) {
+    const list = panel.querySelector('.fleet-list');
+    list.textContent = '';
+    board.ships.forEach(ship => {
+      const li = document.createElement('li');
+      if (ship.sunk) li.classList.add('sunk');
+      const name = document.createElement('span');
+      name.className = 'ship-name';
+      name.textContent = ship.name;
+      const pips = document.createElement('span');
+      pips.className = 'pips';
+      for (const c of ship.cells.length ? ship.cells : Array.from({ length: ship.size })) {
+        const pip = document.createElement('span');
+        pip.className = 'pip';
+        if (c.row !== undefined && board.cells[c.row][c.col].hit) pip.classList.add('hit');
+        pips.appendChild(pip);
+      }
+      const stateEl = document.createElement('span');
+      stateEl.className = 'ship-state';
+      stateEl.textContent = ship.sunk ? 'Sunk' : 'Afloat';
+      li.append(name, pips, stateEl);
+      list.appendChild(li);
+    });
+    const acc = shots ? Math.round((hits / shots) * 100) : 0;
+    panel.querySelector('.fleet-stats').textContent =
+      `Shots: ${shots} · Hits: ${hits} · Accuracy: ${acc}%`;
+  }
+
   function renderShipCells(board, grid, shipIndex) {
     for (const { row, col } of board.ships[shipIndex].cells) {
       const cell = cellAt(grid, row, col);
@@ -293,7 +328,9 @@
     const res = B.fireAt(state.playerBoard, row, col);
     window.BattleshipAI.notifyResult(state.ai, row, col, res);
     state.stats.aiShots++;
+    if (res.result !== 'miss') state.stats.aiHits++;
     paintShot(state.playerBoard, playerGrid, row, col, res);
+    renderFleetPanels();
     const at = B.coord(row, col);
     if (res.result === 'miss') {
       log(`The AI missed at ${at}`, 'ai');
@@ -315,7 +352,9 @@
     if (state.enemyBoard.cells[row][col].hit) return;
     const res = B.fireAt(state.enemyBoard, row, col);
     state.stats.playerShots++;
+    if (res.result !== 'miss') state.stats.playerHits++;
     paintShot(state.enemyBoard, enemyGrid, row, col, res);
+    renderFleetPanels();
     const at = B.coord(row, col);
     if (res.result === 'miss') {
       log(`You missed at ${at}`, 'player');
@@ -362,7 +401,7 @@
     state.nextShip = 0;
     state.aiLock = false;
     state.ai = null;
-    state.stats = { playerShots: 0, aiShots: 0 };
+    state.stats = { playerShots: 0, playerHits: 0, aiShots: 0, aiHits: 0 };
     state.timeouts.forEach(clearTimeout);
     state.timeouts = [];
     buildGrid(playerGrid);
@@ -377,6 +416,7 @@
     $('reset-btn').disabled = false;
     enemyGrid.classList.remove('locked');
     updateSetupStatus();
+    renderFleetPanels();
   }
 
   function startGame() {
@@ -389,6 +429,7 @@
     $('reset-btn').disabled = true;
     clearPreview();
     setStatus('Your turn — fire at Enemy Waters.');
+    renderFleetPanels();
     log('Game started. Good luck!', 'info');
   }
 
@@ -479,6 +520,7 @@
     });
 
     updateSetupStatus();
+    renderFleetPanels();
   }
 
   init();

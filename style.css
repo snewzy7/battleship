@@ -192,11 +192,59 @@ main {
   max-width: 100%;
 }
 
-.controls {
+.controls, .fleet-panel {
   background: #1e293b;
   border-radius: 8px;
   padding: 0.75rem 1rem 1rem;
 }
+
+.fleet-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.fleet-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.2rem 0;
+}
+
+.fleet-list li .ship-name { flex: 1; }
+.fleet-list li.sunk .ship-name {
+  text-decoration: line-through;
+  color: #f87171;
+}
+
+.fleet-list li .ship-state {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+.fleet-list li.sunk .ship-state { color: #f87171; }
+
+.pips { display: flex; gap: 3px; }
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #475569;
+}
+.pip.hit { background: #f97316; }
+.fleet-list li.sunk .pip { background: #dc2626; }
+
+.fleet-stats {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+#log li.player { border-left: 3px solid #38bdf8; }
+#log li.ai { border-left: 3px solid #ef4444; }
 
 .controls button {
   display: block;
