@@ -331,7 +331,7 @@
     } else {
       renderShipCells(board, grid, res.shipIndex);
       board.ships[res.shipIndex].cells.forEach(({ row: r, col: c }, i) => {
-        setTimeout(() => boom(cellAt(grid, r, c)), i * 80);
+        state.timeouts.push(setTimeout(() => boom(cellAt(grid, r, c)), i * 80));
       });
       shakeBoard(grid);
       flashScreen(grid === enemyGrid ? 'gold' : 'red');
@@ -409,8 +409,22 @@
     $('restart-btn').hidden = false;
   }
 
+  function clearEffects() {
+    for (const grid of [playerGrid, enemyGrid]) {
+      for (const cell of grid.children) {
+        cell.classList.remove('boom', 'splash');
+      }
+    }
+    for (const wrap of document.querySelectorAll('.board-wrap')) {
+      wrap.classList.remove('shake');
+    }
+    statusEl.classList.remove('status-hit');
+    $('flash').className = '';
+  }
+
   function restartGame() {
     state.phase = 'setup';
+    clearEffects();
     state.playerBoard = B.createBoard();
     state.enemyBoard = B.createBoard();
     state.orientation = 'h';
