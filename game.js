@@ -140,6 +140,7 @@
     ai: null,
     stats: { playerShots: 0, playerHits: 0, aiShots: 0, aiHits: 0 },
     timeouts: [],
+    hover: null,
   };
 
   const $ = id => document.getElementById(id);
@@ -488,7 +489,8 @@
   function onPlayerCellHover(e) {
     const cell = e.target.closest('.cell');
     if (!cell) return;
-    previewAt(+cell.dataset.row, +cell.dataset.col);
+    state.hover = { row: +cell.dataset.row, col: +cell.dataset.col };
+    previewAt(state.hover.row, state.hover.col);
   }
 
   function resetPlacement() {
@@ -504,6 +506,7 @@
     state.orientation = state.orientation === 'h' ? 'v' : 'h';
     $('rotate-btn').textContent = `Rotate (${state.orientation.toUpperCase()})`;
     updateSetupStatus();
+    if (state.hover) previewAt(state.hover.row, state.hover.col);
   }
 
   function init() {
@@ -514,7 +517,10 @@
 
     playerGrid.addEventListener('click', onPlayerCellClick);
     playerGrid.addEventListener('mouseover', onPlayerCellHover);
-    playerGrid.addEventListener('mouseleave', clearPreview);
+    playerGrid.addEventListener('mouseleave', () => {
+      state.hover = null;
+      clearPreview();
+    });
     $('rotate-btn').addEventListener('click', toggleRotate);
     $('random-btn').addEventListener('click', () => {
       B.randomFleet(state.playerBoard);
