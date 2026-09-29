@@ -416,7 +416,6 @@
     $('overlay-summary').textContent =
       `You fired ${state.stats.playerShots} shots; the AI fired ${state.stats.aiShots}.`;
     $('overlay').hidden = false;
-    $('restart-btn').hidden = false;
   }
 
   function clearEffects() {
@@ -448,7 +447,6 @@
     buildGrid(enemyGrid);
     logEl.textContent = '';
     $('overlay').hidden = true;
-    $('restart-btn').hidden = true;
     $('start-btn').hidden = true;
     $('rotate-btn').disabled = false;
     $('rotate-btn').textContent = 'Rotate (H)';
@@ -558,7 +556,6 @@
     $('reset-btn').addEventListener('click', resetPlacement);
     $('start-btn').addEventListener('click', startGame);
     enemyGrid.addEventListener('click', onEnemyCellClick);
-    $('restart-btn').addEventListener('click', restartGame);
     $('overlay-btn').addEventListener('click', restartGame);
     document.addEventListener('keydown', e => {
       if ((e.key === 'r' || e.key === 'R') && state.phase === 'setup') toggleRotate();

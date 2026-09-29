@@ -285,8 +285,8 @@ main {
 
 .controls button:hover { background: #0284c7; }
 .controls button:disabled { background: #334155; cursor: not-allowed; }
-#start-btn, #restart-btn, #overlay-btn { background: #15803d; }
-#start-btn:hover, #restart-btn:hover, #overlay-btn:hover { background: #16a34a; }
+#start-btn, #overlay-btn { background: #15803d; }
+#start-btn:hover, #overlay-btn:hover { background: #16a34a; }
 
 .log-panel {
   background: #1e293b;
