@@ -291,16 +291,24 @@
     }
   }
 
+  // animationend never fires under prefers-reduced-motion, so always
+  // pair the listener with a tracked timeout fallback.
+  function removeLater(el, cls, ms) {
+    const remove = () => el.classList.remove(cls);
+    el.addEventListener('animationend', remove, { once: true });
+    state.timeouts.push(setTimeout(remove, ms + 50));
+  }
+
   function boom(cell) {
     cell.classList.add('boom');
-    cell.addEventListener('animationend', () => cell.classList.remove('boom'), { once: true });
+    removeLater(cell, 'boom', 700);
   }
 
   function statusPulse() {
     statusEl.classList.remove('status-hit');
     void statusEl.offsetWidth;
     statusEl.classList.add('status-hit');
-    statusEl.addEventListener('animationend', () => statusEl.classList.remove('status-hit'), { once: true });
+    removeLater(statusEl, 'status-hit', 600);
   }
 
   function flashScreen(kind) {
@@ -308,14 +316,16 @@
     flash.className = '';
     void flash.offsetWidth;
     flash.classList.add('on', kind);
-    flash.addEventListener('animationend', () => { flash.className = ''; }, { once: true });
+    const remove = () => { flash.className = ''; };
+    flash.addEventListener('animationend', remove, { once: true });
+    state.timeouts.push(setTimeout(remove, 450));
   }
 
   function shakeBoard(grid) {
     const wrap = grid.closest('.board-wrap');
     if (!wrap) return;
     wrap.classList.add('shake');
-    wrap.addEventListener('animationend', () => wrap.classList.remove('shake'), { once: true });
+    removeLater(wrap, 'shake', 500);
   }
 
   function paintShot(board, grid, row, col, res) {
@@ -323,7 +333,7 @@
     cell.classList.add('fired');
     if (res.result === 'miss') {
       cell.classList.add('miss', 'splash');
-      cell.addEventListener('animationend', () => cell.classList.remove('splash'), { once: true });
+      removeLater(cell, 'splash', 500);
     } else if (res.result === 'hit') {
       cell.classList.add('hit');
       boom(cell);

@@ -155,14 +155,14 @@ main {
 }
 
 @keyframes boom {
-  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.9); }
-  40%  { transform: scale(1.6); box-shadow: 0 0 30px 18px rgba(220, 38, 38, 0.8); }
+  0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.9);
+         background: radial-gradient(circle, #fdba74 0%, #f97316 45%, #dc2626 100%); z-index: 2; }
+  40%  { transform: scale(1.6); box-shadow: 0 0 30px 18px rgba(220, 38, 38, 0.8);
+         background: radial-gradient(circle, #fdba74 0%, #f97316 45%, #dc2626 100%); z-index: 2; }
   100% { transform: scale(1); box-shadow: 0 0 0 30px rgba(220, 38, 38, 0); }
 }
 .cell.boom {
   animation: boom 0.7s ease-out;
-  background: radial-gradient(circle, #fdba74 0%, #f97316 45%, #dc2626 100%);
-  z-index: 2;
 }
 
 @keyframes splash {
