@@ -5,11 +5,11 @@
   const COLS = 'ABCDEFGHIJ';
 
   const SHIPS = [
-    { name: 'Carrier', size: 5, key: 'buldak', label: 'Buldak Spicy Carbonara Ramen', short: 'Buldak', color: '#e23b5a' },
-    { name: 'Battleship', size: 4, key: 'takis', label: "Trader Joe's Chili & Lime Rolled Corn Tortilla Chips", short: "TJ's Takis", color: '#f0742a' },
-    { name: 'Cruiser', size: 3, key: 'cfa', label: 'Chick-fil-A Sauce', short: 'Chick-fil-A Sauce', color: '#d84a2b' },
-    { name: 'Submarine', size: 3, key: 'pbcups', label: 'Peanut Butter Cups', short: 'PB Cups', color: '#b5651d' },
-    { name: 'Destroyer', size: 2, key: 'poppi', label: 'Raspberry Rose Poppi', short: 'Poppi', color: '#e05a9c' },
+    { name: 'Carrier', size: 5, key: 'buldak', label: 'Buldak Spicy Carbonara Ramen', short: 'Buldak', color: '#d4213d' },
+    { name: 'Battleship', size: 4, key: 'takis', label: "Trader Joe's Chili & Lime Rolled Corn Tortilla Chips", short: "TJ's Takis", color: '#ef7d1a' },
+    { name: 'Cruiser', size: 3, key: 'cfa', label: 'Chick-fil-A Sauce', short: 'Chick-fil-A Sauce', color: '#b3261e' },
+    { name: 'Submarine', size: 3, key: 'pbcups', label: 'Peanut Butter Cups', short: 'PB Cups', color: '#5c3a21' },
+    { name: 'Destroyer', size: 2, key: 'poppi', label: 'Raspberry Rose Poppi', short: 'Poppi', color: '#8e2a5a' },
   ];
 
   function createBoard() {
@@ -266,12 +266,16 @@
         const cell = cellAt(playerGrid, r, c);
         cell.classList.remove('ship', 'ship-h', 'ship-v', 'ship-bow', 'ship-stern', 'ship-mid');
         cell.style.removeProperty('--item');
+        cell.style.removeProperty('--n');
         delete cell.dataset.glyph;
+        delete cell.dataset.label;
         const idx = state.playerBoard.cells[r][c].ship;
         if (idx !== null) {
           cell.classList.add(...shipShapeClasses(state.playerBoard.ships[idx], r, c));
           cell.style.setProperty('--item', SHIPS[idx].color);
+          cell.style.setProperty('--n', SHIPS[idx].size);
           cell.dataset.glyph = SHIPS[idx].short[0];
+          cell.dataset.label = SHIPS[idx].short;
         }
       }
     }
@@ -318,6 +322,7 @@
     board.ships.forEach((ship, i) => {
       const li = document.createElement('li');
       if (ship.sunk) li.classList.add('sunk');
+      li.style.setProperty('--item', SHIPS[i].color);
       const name = document.createElement('span');
       name.className = 'ship-name';
       name.textContent = SHIPS[i].label;
@@ -333,7 +338,8 @@
       const stateEl = document.createElement('span');
       stateEl.className = 'ship-state';
       const hits = ship.cells.filter(c => board.cells[c.row][c.col].hit).length;
-      stateEl.textContent = ship.sunk ? 'gone' : (hits > 0 ? 'found' : 'on the shelf');
+      if (!ship.sunk && hits > 0) li.classList.add('found');
+      stateEl.textContent = ship.sunk ? 'gone' : (hits > 0 ? 'found' : 'in stock');
       li.append(name, pips, stateEl);
       list.appendChild(li);
     });
@@ -349,7 +355,9 @@
       cell.classList.remove('hit');
       cell.classList.add('sunk', ...shipShapeClasses(ship, row, col));
       cell.style.setProperty('--item', SHIPS[shipIndex].color);
+      cell.style.setProperty('--n', SHIPS[shipIndex].size);
       cell.dataset.glyph = SHIPS[shipIndex].short[0];
+      cell.dataset.label = SHIPS[shipIndex].short;
     }
   }
 

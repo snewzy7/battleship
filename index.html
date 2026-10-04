@@ -6,12 +6,12 @@
   <title>The Pantry</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>The Pantry</h1>
+    <div class="sign"><span class="sign-aisle">Aisle 1</span><h1>The Pantry</h1></div>
     <p class="tagline">protect your snacks. raid theirs.</p>
     <p id="status"></p>
   </header>
@@ -19,7 +19,7 @@
   <main>
     <section class="boards">
       <div class="board-wrap">
-        <h2>Your Pantry</h2>
+        <h2 class="shelf-sign"><span>Your Pantry</span><small>stock 5 · defend</small></h2>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="player-col-labels"></div>
@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="board-wrap">
-        <h2>Roommate's Pantry</h2>
+        <h2 class="shelf-sign"><span>Roommate's Pantry</span><small>search · take</small></h2>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="enemy-col-labels"></div>
