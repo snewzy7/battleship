@@ -2,7 +2,7 @@
 const assert = require('assert');
 const R = require('../roommate.js');
 
-const items = ['buldak', 'takis', 'cfa', 'pbcups', 'poppi'];
+const items = ['mac', 'pringles', 'hotsauce', 'pbcups', 'drpepper'];
 const rm = R.createRoommate();
 
 // Every top-level pool never repeats a line until exhausted.
@@ -32,6 +32,6 @@ for (let g = 0; g < 500; g++) {
 }
 // last item lines fire
 const r2 = R.createRoommate();
-assert(R.LINES.rm_last_item.includes(R.react(r2, { actor: 'roommate', result: 'sunk', item: 'cfa', score: { youGone: 4, rmGone: 0 } })));
-assert(R.LINES.you_last_item.includes(R.react(r2, { actor: 'you', result: 'sunk', item: 'cfa', score: { youGone: 0, rmGone: 4 } })));
+assert(R.LINES.rm_last_item.includes(R.react(r2, { actor: 'roommate', result: 'sunk', item: 'hotsauce', score: { youGone: 4, rmGone: 0 } })));
+assert(R.LINES.you_last_item.includes(R.react(r2, { actor: 'you', result: 'sunk', item: 'hotsauce', score: { youGone: 0, rmGone: 4 } })));
 console.log('roommate tests passed');

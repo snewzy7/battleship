@@ -5,12 +5,12 @@
   const COLS = 'ABCDEFGHIJ';
 
   const SHIPS = [
-    { name: 'Carrier', size: 5, key: 'buldak', label: 'Buldak Spicy Carbonara Ramen', short: 'Buldak', color: '#d4213d', blurb: 'the nuclear option. emergency dinner, always.' },
-    { name: 'Battleship', size: 4, key: 'takis', label: "Trader Joe's Chili & Lime Rolled Corn Tortilla Chips", short: "TJ's Takis", color: '#ef7d1a', blurb: 'technically chili & lime. but we all know.' },
-    { name: 'Cruiser', size: 3, key: 'cfa', label: 'Chick-fil-A Sauce', short: 'The Sauce', color: '#dd0031', blurb: 'for nuggets, fries, everything. non-negotiable.' },
-    { name: 'Submarine', size: 3, key: 'pbcups', label: 'Peanut Butter Cups', short: 'PB Cups', color: '#f36f21', blurb: 'never safe. ever.' },
-    { name: 'Destroyer', size: 2, key: 'poppi', label: 'Raspberry Rose Poppi', short: 'Poppi', color: '#e05a8f', blurb: 'the perfect treat. yes, it counts.' },
-  ];
+    { name: 'Carrier', size: 5, key: 'mac', label: 'Kraft Mac & Cheese', short: 'Mac & Cheese', color: '#2b6cb0', blurb: 'the blue box. emergency dinner, always.' },
+    { name: 'Battleship', size: 4, key: 'pringles', label: 'Pringles', short: 'Pringles', color: '#d1232a', blurb: 'once you pop. you know the rest.' },
+    { name: 'Cruiser', size: 3, key: 'hotsauce', label: "Ray's Red Hot Sauce", short: 'Hot Sauce', color: '#e8dcc3', blurb: 'goes on everything. non-negotiable.' },
+    { name: 'Submarine', size: 3, key: 'pbcups', label: 'Peanut Butter Cups', short: 'PB Cups', color: '#b5602a', blurb: 'never safe. ever.' },
+    { name: 'Destroyer', size: 2, key: 'drpepper', label: 'Dr Pepper', short: 'Dr Pepper', color: '#8b1a2b', blurb: 'the 23 flavors. yes, it counts.' },
+  ]
 
   function createBoard() {
     const cells = [];
@@ -210,6 +210,13 @@
     time.textContent = stamp();
     li.append(body, time);
     chatLog.appendChild(li);
+    if ((who || 'rm') === 'rm') {
+      const card = $('speech-text');
+      card.textContent = text;
+      $('speech').classList.remove('bump');
+      void $('speech').offsetWidth;
+      $('speech').classList.add('bump');
+    }
     while (chatLog.children.length > 14) chatLog.firstChild.remove();
     chatLog.scrollTop = chatLog.scrollHeight;
   }
@@ -269,18 +276,13 @@
     return ['ship', horizontal ? 'ship-h' : 'ship-v', pos];
   }
 
-  function placePackage(grid, ship, shipIndex) {
-    if (!ship.cells.length) return;
-    const first = ship.cells[0];
-    const horizontal = ship.cells.every(c => c.row === first.row);
-    const cell = cellAt(grid, first.row, first.col);
-    cell.insertAdjacentHTML('beforeend',
-      window.Packages.svg(SHIPS[shipIndex].key, ship.size, horizontal ? 'h' : 'v'));
+  function putTile(cell, shipIndex) {
+    if (cell.querySelector('.pkg')) return;
+    cell.insertAdjacentHTML('beforeend', window.Packages.icon(SHIPS[shipIndex].key));
   }
 
   function renderPlayerBoard() {
     playerGrid.querySelectorAll('.pkg').forEach(el => el.remove());
-    state.playerBoard.ships.forEach((ship, i) => placePackage(playerGrid, ship, i));
     for (let r = 0; r < SIZE; r++) {
       for (let c = 0; c < SIZE; c++) {
         const cell = cellAt(playerGrid, r, c);
@@ -296,6 +298,7 @@
           cell.style.setProperty('--n', SHIPS[idx].size);
           cell.dataset.glyph = SHIPS[idx].short[0];
           cell.dataset.label = SHIPS[idx].short;
+          putTile(cell, idx);
         }
       }
     }
@@ -352,13 +355,13 @@
 
       const art = document.createElement('div');
       art.className = 'card-art';
-      art.innerHTML = window.Packages.svg(meta.key, 2, 'v');
+      art.innerHTML = window.Packages.icon(meta.key, 'pkg big');
       const name = document.createElement('span');
       name.className = 'ship-name';
       name.textContent = meta.short;
       const size = document.createElement('span');
       size.className = 'ship-size';
-      size.textContent = `${ship.size} shelves`;
+      size.textContent = `${ship.size} spaces`;
       const pips = document.createElement('span');
       pips.className = 'pips';
       for (let k = 0; k < ship.size; k++) {
@@ -392,9 +395,7 @@
       cell.style.setProperty('--n', SHIPS[shipIndex].size);
       cell.dataset.glyph = SHIPS[shipIndex].short[0];
       cell.dataset.label = SHIPS[shipIndex].short;
-    }
-    if (!cellAt(grid, ship.cells[0].row, ship.cells[0].col).querySelector('.pkg')) {
-      placePackage(grid, ship, shipIndex);
+      putTile(cell, shipIndex);
     }
   }
 
@@ -429,7 +430,7 @@
   }
 
   function shakeBoard(grid) {
-    const wrap = grid.closest('.board-wrap');
+    const wrap = grid.closest('.cabinet');
     if (!wrap) return;
     wrap.classList.add('shake');
     removeLater(wrap, 'shake', 500);
@@ -532,7 +533,7 @@
     log(title, 'info');
     $('overlay-title').textContent = title;
     $('overlay-summary').textContent =
-      `You searched ${state.stats.playerShots} shelves; the roommate searched ${state.stats.aiShots}.`;
+      `You searched ${state.stats.playerShots} squares; the roommate searched ${state.stats.aiShots}.`;
     const quote = window.Roommate.line(state.roommate, playerWon ? 'you_win' : 'rm_win');
     say(quote);
     $('overlay-quote').textContent = quote ? `“${quote}”` : '';
@@ -545,7 +546,7 @@
         cell.classList.remove('boom', 'splash');
       }
     }
-    for (const wrap of document.querySelectorAll('.board-wrap')) {
+    for (const wrap of document.querySelectorAll('.cabinet')) {
       wrap.classList.remove('shake');
     }
     statusEl.classList.remove('status-hit');
@@ -604,7 +605,7 @@
   function updateSetupStatus() {
     if (state.nextShip < SHIPS.length) {
       const s = SHIPS[state.nextShip];
-      setStatus(`Stock your pantry — place the ${s.short} (${s.size} shelves), ${orientationWord()}. Press R to rotate`);
+      setStatus(`Stock your pantry — place the ${s.short} (${s.size} squares), ${orientationWord()}. Press R to rotate`);
     } else {
       setStatus('Pantry stocked. Hit “Pantry Stocked” below to start raiding.');
     }
@@ -663,7 +664,20 @@
     if (state.hover) previewAt(state.hover.row, state.hover.col);
   }
 
+  function initHelp() {
+    const help = $('help');
+    $('help-btn').addEventListener('click', () => { help.hidden = false; });
+    $('help-close').addEventListener('click', () => {
+      help.hidden = true;
+      try { localStorage.setItem('snackattack-seen', '1'); } catch (e) { /* ignore */ }
+    });
+    let seen = false;
+    try { seen = localStorage.getItem('snackattack-seen') === '1'; } catch (e) { /* ignore */ }
+    help.hidden = seen;
+  }
+
   function init() {
+    initHelp();
     state.roommate = window.Roommate.createRoommate();
     state.timeouts.push(setTimeout(() => {
       say(window.Roommate.line(state.roommate, 'lobby'));

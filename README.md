@@ -13,11 +13,11 @@ Each item occupies contiguous cells on a 10×10 pantry grid:
 
 | Item | Shelves |
 |---|---|
-| Buldak Spicy Carbonara Ramen | 5 |
-| Trader Joe's Chili & Lime Rolled Corn Tortilla Chips | 4 |
-| Chick-fil-A Sauce | 3 |
+| Kraft Mac & Cheese | 5 |
+| Pringles | 4 |
+| Ray's Red Hot Sauce | 3 |
 | Peanut Butter Cups | 3 |
-| Raspberry Rose Poppi | 2 |
+| Dr Pepper | 2 |
 
 ## Run locally
 
@@ -71,7 +71,7 @@ is called after every shot with `{actor, result, item, score}` and selects a
 line by specificity:
 
 1. **Item × result** — a line specific to what was found/taken
-   ("oh you were hiding the buldak from me??").
+   ("wait... you actually have pringles in here?").
 2. **Streaks** — 3+ misses or 2+ finds in a row by the same actor.
 3. **Momentum** — who's ahead, or a last-item warning.
 4. **Milestones** — game start, win, loss (`line(rm, key)` for

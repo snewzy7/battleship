@@ -6,98 +6,87 @@
   <title>Snack Attack</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="top">
     <div class="brand">
-      <h1><span class="dash">&#8212;</span> Snack Attack <span class="dash">&#8212;</span></h1>
-      <p class="tagline">protect your snacks from your hungry roommate.</p>
+      <h1><span class="mark">&gt;</span> Snack Attack <span class="mark">&lt;</span></h1>
+      <p class="tagline">Protect your snacks from<br>your hungry roommate.</p>
     </div>
-    <button id="restart-top" class="pill" type="button">Run It Back</button>
+    <nav class="nav">
+      <button id="help-btn" class="link" type="button">How to Play</button>
+      <button id="restart-top" class="pill" type="button">Run It Back</button>
+    </nav>
   </header>
-  <p id="status"></p>
 
   <main>
-    <section class="boards">
-      <div class="board-wrap" id="player-wrap">
-        <div class="board-head">
-          <h2 class="tape">Your Pantry</h2>
-          <div class="controls">
-            <span class="tape note">click to place &middot; R rotates</span>
-            <button id="rotate-btn" type="button">Rotate (H)</button>
-            <button id="random-btn" type="button">Stock randomly</button>
-            <button id="reset-btn" type="button">Clear</button>
-          </div>
-        </div>
+    <section class="cabinet" id="player-wrap">
+      <div class="shelf-side left"><i></i><i></i><i></i><i></i></div>
+      <div class="cabinet-inner">
+        <h2 class="plaque">Your Pantry</h2>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="player-col-labels"></div>
           <div class="row-labels" id="player-row-labels"></div>
           <div class="grid" id="player-grid"></div>
         </div>
-      </div>
-      <div class="board-wrap">
-        <div class="board-head">
-          <h2 class="tape">Roommate's Pantry</h2>
-          <span class="tape note">click a shelf to search it</span>
+        <div class="controls">
+          <button id="rotate-btn" type="button">Rotate (H)</button>
+          <button id="random-btn" type="button">Stock randomly</button>
+          <button id="reset-btn" type="button">Clear</button>
+          <button id="start-btn" type="button" hidden>Pantry Stocked &rarr;</button>
         </div>
+      </div>
+      <div class="shelf-side right"><i></i><i></i><i></i><i></i></div>
+    </section>
+
+    <aside class="middle">
+      <div class="kitchen"></div>
+      <div class="speech" id="speech">
+        <span class="spark">&#8226;&#8226;</span>
+        <p id="speech-text">hurry up, i'm hungry</p>
+        <p id="status"></p>
+      </div>
+      <div class="chat" id="chat">
+        <div class="chat-head">your hungry roommate</div>
+        <ul id="chat-log"></ul>
+      </div>
+    </aside>
+
+    <section class="cabinet">
+      <div class="shelf-side left"><i></i><i></i><i></i><i></i></div>
+      <div class="cabinet-inner">
+        <h2 class="plaque">Roommate's Pantry</h2>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="enemy-col-labels"></div>
           <div class="row-labels" id="enemy-row-labels"></div>
           <div class="grid" id="enemy-grid"></div>
         </div>
+        <p class="legend"><span class="x"></span> found it <span class="dot"></span> empty shelf</p>
       </div>
+      <div class="shelf-side right"><i></i><i></i><i></i><i></i></div>
     </section>
-
-    <aside class="chat" id="chat">
-      <div class="chat-head">
-        <div class="polaroid">
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <rect width="100" height="100" fill="#f3e2d3"/>
-            <circle cx="50" cy="42" r="22" fill="#e9b89a"/>
-            <path d="M28 40 q8 -30 44 -22 q6 10 -2 18 q-20 -6 -42 4z" fill="#3b2a24"/>
-            <circle cx="42" cy="42" r="2.5" fill="#2b1d18"/>
-            <circle cx="58" cy="42" r="2.5" fill="#2b1d18"/>
-            <path d="M44 56 q6 4 12 0" fill="none" stroke="#9c4a3c" stroke-width="2"/>
-            <rect x="52" y="52" width="26" height="14" rx="3" fill="#ef7d1a" transform="rotate(-20 65 59)"/>
-            <path d="M20 100 q30 -40 60 0z" fill="#c9c9d6"/>
-          </svg>
-        </div>
-        <div class="chat-title">
-          <span class="arrow">&#8598;</span>
-          <span>your hungry roommate</span>
-        </div>
-      </div>
-      <ul id="chat-log"></ul>
-    </aside>
   </main>
 
   <section class="strip" id="player-fleet">
     <div class="strip-head">
-      <h2 class="marker">Your Pantry</h2>
-      <p class="hint">Each snack takes up a set number of shelves. Stock all five, then start raiding.</p>
+      <h2>Your Pantry Items</h2>
+      <p class="hint">Click your pantry grid to place each one. Each item takes up a certain number of squares.</p>
+      <p class="fleet-stats"></p>
     </div>
-    <div class="strip-body">
-      <ul class="fleet-list"></ul>
-      <div class="cta">
-        <button id="start-btn" type="button" hidden>Pantry Stocked &rarr;</button>
-        <p class="fleet-stats"></p>
-      </div>
-    </div>
+    <ul class="fleet-list"></ul>
   </section>
 
   <section class="strip strip-rm" id="enemy-fleet">
     <div class="strip-head">
-      <h2 class="marker">Roommate's Pantry</h2>
-      <p class="hint">What you've found over there so far.</p>
+      <h2>Roommate's Pantry Items</h2>
+      <p class="hint">Same five snacks, hidden over there. Find every square of an item to take it.</p>
+      <p class="fleet-stats"></p>
     </div>
-    <div class="strip-body">
-      <ul class="fleet-list"></ul>
-      <div class="cta"><p class="fleet-stats"></p></div>
-    </div>
+    <ul class="fleet-list"></ul>
   </section>
 
   <details class="log-panel">
@@ -107,8 +96,20 @@
 
   <div id="flash"></div>
 
-  <div id="overlay" hidden>
-    <div class="overlay-card">
+  <div id="help" class="modal" hidden>
+    <div class="modal-card">
+      <h2>It's Battleship. Just snacks.</h2>
+      <ol>
+        <li><strong>Stock your pantry.</strong> Place five snacks on your grid (click a square, R to rotate, or "Stock randomly"). Your roommate hides theirs too.</li>
+        <li><strong>Take turns searching.</strong> Click a square on the roommate's pantry. A red X means you found part of a snack; a dot means an empty shelf. Then they search yours.</li>
+        <li><strong>Find every square of a snack to take it.</strong> Clear out all five of theirs before they eat all of yours.</li>
+      </ol>
+      <button id="help-close" class="pill" type="button">Got it</button>
+    </div>
+  </div>
+
+  <div id="overlay" class="modal" hidden>
+    <div class="modal-card">
       <h2 id="overlay-title"></h2>
       <p id="overlay-summary"></p>
       <p id="overlay-quote"></p>
