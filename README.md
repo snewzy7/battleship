@@ -1,9 +1,23 @@
-# Battleship
+# The Pantry
 
-A browser Battleship game: human vs AI on two 10x10 grids. Plain HTML/CSS/JS —
-no build step, no framework, no backend.
+A browser Battleship game, reskinned as an editorial grocery duel: you stock
+five snacks on your pantry shelves and protect them from your hungry roommate
+while raiding theirs. Plain HTML/CSS/JS — no build step, no framework, no
+backend.
 
-Live demo: https://snewzy7.github.io/battleship/
+Live demo: (URL to be added)
+
+## The shelf
+
+Each item occupies contiguous cells on a 10×10 pantry grid:
+
+| Item | Shelves |
+|---|---|
+| Buldak Spicy Carbonara Ramen | 5 |
+| Trader Joe's Chili & Lime Rolled Corn Tortilla Chips | 4 |
+| Chick-fil-A Sauce | 3 |
+| Peanut Butter Cups | 3 |
+| Raspberry Rose Poppi | 2 |
 
 ## Run locally
 
@@ -22,59 +36,74 @@ No dependencies to install.
 
 ## How to play
 
-1. **Setup** — place your five ships on *Your Fleet*. Click a cell to place the
-   ship named in the status line; it extends horizontally or vertically from
-   that cell. Hovering previews placement (green = valid, red = invalid).
-   - `Rotate (H/V)` button or the `R` key toggles orientation.
-   - `Place randomly` places the whole fleet for you.
-   - `Reset placement` clears the board.
-2. Click **Start game** once all five ships are placed.
-3. **Battle** — click cells in *Enemy Waters* to fire. Hits are orange,
-   misses blue, sunk ships red. You and the AI alternate shots; the AI takes
-   a beat (about 1.4s, longer after a hit) before returning fire, with boom,
-   shake and flash effects on hits and sinkings.
-4. The side panel shows a per-player dashboard: each fleet's ships with
-   damage pips plus shots/hits/accuracy, a "Command" controls box, and the
-   battle log (blue = you, red = AI).
-5. The game ends when all five ships on one side are sunk. Click **Play again**
-   to restart.
+1. **Stock your pantry** — click a cell to place the item named in the status
+   line; it extends horizontally or vertically. Hovering previews placement
+   (green = fits, red = doesn't). `Rotate (H/V)` or the `R` key toggles
+   orientation; `Stock randomly` and `Clear shelves` do what they say.
+2. Click **Start** once all five items are shelved.
+3. **Raid** — click cells in the Roommate's Pantry to search a shelf. Filled
+   color = found, dashed outline = empty shelf, struck-through color = gone.
+   The roommate searches your pantry after a beat; watch the chat strip for
+   their running commentary.
+4. The side panel shows both pantries' shelf lists (item, damage pips, state:
+   on the shelf · found · gone) plus searches/found/hit rate.
+5. Game over when one pantry is cleaned out. Click **Run It Back** to restock.
 
-Ships: Carrier (5), Battleship (4), Cruiser (3), Submarine (3), Destroyer (2).
-
-## How the AI targets
+## How the roommate targets
 
 The AI (in `ai.js`) uses a classic hunt/target strategy:
 
 - **Hunt mode** — with no live leads, it picks a random unfired cell.
-- **Target mode** — after a hit, it fires at unfired orthogonal neighbors of
-  the hit cells belonging to that ship.
-- **Line extension** — once it has two or more hits on the same ship (which
-  are necessarily collinear), it stops probing neighbors and only fires at the
-  two ends of the established line, sinking the ship efficiently.
-- **Recovery** — when a ship is sunk, its hits are dropped. If hits on other
-  ships remain (possible when ships were adjacent), the AI stays in target
-  mode and works on those; otherwise it returns to hunt mode.
+- **Target mode** — after a hit, it searches unfired orthogonal neighbors of
+  the hit cells belonging to that item.
+- **Line extension** — once it has two or more hits on the same item (which
+  are necessarily collinear), it only fires at the two ends of the
+  established line.
+- **Recovery** — when an item is gone, its hits are dropped; hits on other
+  items (from adjacent placements) keep it in target mode.
 
-A `Set` of every fired cell guarantees it never shoots the same cell twice.
-The module is pure — functions take board state and return `{row, col}` — and
-is exercised by `tests/ai.test.js`, which simulates 200 full games and asserts
-the AI always wins within 100 shots. Run tests with:
+A `Set` of fired cells guarantees it never searches the same shelf twice.
+
+## The Hungry Roommate dialogue
+
+`roommate.js` is a pure, context-aware line picker — no DOM. `react(rm, ev)`
+is called after every shot with `{actor, result, item, score}` and selects a
+line by specificity:
+
+1. **Item × result** — a line specific to what was found/taken
+   ("oh you were hiding the buldak from me??").
+2. **Streaks** — 3+ misses or 2+ finds in a row by the same actor.
+3. **Momentum** — who's ahead, or a last-item warning.
+4. **Milestones** — game start, win, loss (`line(rm, key)` for
+   `start`/`idle`/`rm_win`/`you_win`).
+5. **Generic fallback** — per-result pools.
+
+Every pool uses a shuffled cursor, so no line repeats until the pool is
+exhausted. The roommate only reacts to ~45% of your misses to keep noise
+down, and idles ("you good?") if you take more than 15 s on your turn. All
+lines live in the `LINES` object at the top of `roommate.js` — edit freely
+without touching the selection logic.
+
+## Tests
 
 ```sh
-node tests/ai.test.js
+node tests/ai.test.js        # 200 simulated games, placement validation
+node tests/roommate.test.js  # dialogue pool coverage, no immediate repeats
 ```
 
 ## Project structure
 
 ```
-index.html   page layout: two grids, controls, log, end-game overlay
-style.css    styling, cell states, responsive layout
-game.js      board model (Battleship namespace) + all UI/game logic
-ai.js        hunt/target AI (BattleshipAI namespace)
-tests/       Node test script for the AI and placement validation
-.nojekyll    disable Jekyll processing on GitHub Pages
+index.html     page shell: two pantry grids, chat strip, panels, overlay
+style.css      editorial pantry theme (Fraunces + Inter), effects
+game.js        board model (Battleship namespace) + all UI/game logic
+ai.js          hunt/target search AI (BattleshipAI namespace)
+roommate.js    Hungry Roommate dialogue engine (Roommate namespace)
+tests/         Node tests for the AI and the dialogue engine
+.nojekyll      disable Jekyll processing on GitHub Pages
 ```
 
-Scripts are plain (non-module) files loaded in order `ai.js`, `game.js`, so
-the game also works when opened via `file://`. Both scripts also export via
-`module.exports` when present, which is how the Node tests load them.
+Scripts are plain (non-module) files loaded in order `ai.js`,
+`roommate.js`, `game.js`, so the game also works over `file://`. Each also
+exports via `module.exports` when present, which is how the Node tests load
+them.
