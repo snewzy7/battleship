@@ -1,11 +1,11 @@
-# The Pantry
+# Snack Attack
 
-A browser Battleship game, reskinned as an editorial grocery duel: you stock
-five snacks on your pantry shelves and protect them from your hungry roommate
-while raiding theirs. Plain HTML/CSS/JS — no build step, no framework, no
+A browser Battleship game where you protect your snacks from your hungry
+roommate: stock five snacks on your pantry shelves, then raid theirs before
+they clean you out. Plain HTML/CSS/JS — no build step, no framework, no
 backend.
 
-Live demo: (URL to be added)
+Live demo: https://snewzy7.github.io/battleship/
 
 ## The shelf
 
@@ -94,8 +94,9 @@ node tests/roommate.test.js  # dialogue pool coverage, no immediate repeats
 ## Project structure
 
 ```
-index.html     page shell: two pantry grids, chat strip, panels, overlay
-style.css      editorial pantry theme (Fraunces + Inter), effects
+index.html     page shell: two pantry trays, roommate chat, snack cards, overlay
+style.css      Snack Attack theme (Permanent Marker + Caveat + Inter), effects
+packages.js    stylized SVG snack packages drawn on the grid and cards
 game.js        board model (Battleship namespace) + all UI/game logic
 ai.js          hunt/target search AI (BattleshipAI namespace)
 roommate.js    Hungry Roommate dialogue engine (Roommate namespace)
@@ -104,6 +105,6 @@ tests/         Node tests for the AI and the dialogue engine
 ```
 
 Scripts are plain (non-module) files loaded in order `ai.js`,
-`roommate.js`, `game.js`, so the game also works over `file://`. Each also
+`roommate.js`, `packages.js`, `game.js`, so the game also works over `file://`. Each also
 exports via `module.exports` when present, which is how the Node tests load
 them.

@@ -5,11 +5,11 @@
   const COLS = 'ABCDEFGHIJ';
 
   const SHIPS = [
-    { name: 'Carrier', size: 5, key: 'buldak', label: 'Buldak Spicy Carbonara Ramen', short: 'Buldak', color: '#d4213d' },
-    { name: 'Battleship', size: 4, key: 'takis', label: "Trader Joe's Chili & Lime Rolled Corn Tortilla Chips", short: "TJ's Takis", color: '#ef7d1a' },
-    { name: 'Cruiser', size: 3, key: 'cfa', label: 'Chick-fil-A Sauce', short: 'Chick-fil-A Sauce', color: '#b3261e' },
-    { name: 'Submarine', size: 3, key: 'pbcups', label: 'Peanut Butter Cups', short: 'PB Cups', color: '#5c3a21' },
-    { name: 'Destroyer', size: 2, key: 'poppi', label: 'Raspberry Rose Poppi', short: 'Poppi', color: '#8e2a5a' },
+    { name: 'Carrier', size: 5, key: 'buldak', label: 'Buldak Spicy Carbonara Ramen', short: 'Buldak', color: '#d4213d', blurb: 'the nuclear option. emergency dinner, always.' },
+    { name: 'Battleship', size: 4, key: 'takis', label: "Trader Joe's Chili & Lime Rolled Corn Tortilla Chips", short: "TJ's Takis", color: '#ef7d1a', blurb: 'technically chili & lime. but we all know.' },
+    { name: 'Cruiser', size: 3, key: 'cfa', label: 'Chick-fil-A Sauce', short: 'The Sauce', color: '#dd0031', blurb: 'for nuggets, fries, everything. non-negotiable.' },
+    { name: 'Submarine', size: 3, key: 'pbcups', label: 'Peanut Butter Cups', short: 'PB Cups', color: '#f36f21', blurb: 'never safe. ever.' },
+    { name: 'Destroyer', size: 2, key: 'poppi', label: 'Raspberry Rose Poppi', short: 'Poppi', color: '#e05a8f', blurb: 'the perfect treat. yes, it counts.' },
   ];
 
   function createBoard() {
@@ -195,20 +195,29 @@
     statusEl.textContent = text;
   }
 
-  function say(text) {
+  function stamp() {
+    return new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+
+  function say(text, who) {
     if (!text) return;
     const li = document.createElement('li');
-    li.className = 'bubble';
-    li.textContent = text;
+    li.className = `bubble ${who || 'rm'}`;
+    const body = document.createElement('span');
+    body.className = 'bubble-text';
+    body.textContent = text;
+    const time = document.createElement('time');
+    time.textContent = stamp();
+    li.append(body, time);
     chatLog.appendChild(li);
-    while (chatLog.children.length > 8) chatLog.firstChild.remove();
+    while (chatLog.children.length > 14) chatLog.firstChild.remove();
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
   function showTyping() {
     hideTyping();
     const li = document.createElement('li');
-    li.className = 'bubble typing';
+    li.className = 'bubble rm typing';
     li.id = 'typing-bubble';
     li.innerHTML = '<span></span><span></span><span></span>';
     chatLog.appendChild(li);
@@ -260,7 +269,18 @@
     return ['ship', horizontal ? 'ship-h' : 'ship-v', pos];
   }
 
+  function placePackage(grid, ship, shipIndex) {
+    if (!ship.cells.length) return;
+    const first = ship.cells[0];
+    const horizontal = ship.cells.every(c => c.row === first.row);
+    const cell = cellAt(grid, first.row, first.col);
+    cell.insertAdjacentHTML('beforeend',
+      window.Packages.svg(SHIPS[shipIndex].key, ship.size, horizontal ? 'h' : 'v'));
+  }
+
   function renderPlayerBoard() {
+    playerGrid.querySelectorAll('.pkg').forEach(el => el.remove());
+    state.playerBoard.ships.forEach((ship, i) => placePackage(playerGrid, ship, i));
     for (let r = 0; r < SIZE; r++) {
       for (let c = 0; c < SIZE; c++) {
         const cell = cellAt(playerGrid, r, c);
@@ -318,34 +338,48 @@
 
   function renderFleetPanel(panel, board, shots, hits) {
     const list = panel.querySelector('.fleet-list');
+    const mine = panel.id === 'player-fleet';
     list.textContent = '';
     board.ships.forEach((ship, i) => {
+      const meta = SHIPS[i];
+      const found = ship.cells.filter(c => board.cells[c.row][c.col].hit).length;
       const li = document.createElement('li');
+      li.className = 'card';
       if (ship.sunk) li.classList.add('sunk');
-      li.style.setProperty('--item', SHIPS[i].color);
+      else if (found > 0) li.classList.add('found');
+      if (!mine && found === 0) li.classList.add('unknown');
+      li.style.setProperty('--item', meta.color);
+
+      const art = document.createElement('div');
+      art.className = 'card-art';
+      art.innerHTML = window.Packages.svg(meta.key, 2, 'v');
       const name = document.createElement('span');
       name.className = 'ship-name';
-      name.textContent = SHIPS[i].label;
+      name.textContent = meta.short;
+      const size = document.createElement('span');
+      size.className = 'ship-size';
+      size.textContent = `${ship.size} shelves`;
       const pips = document.createElement('span');
       pips.className = 'pips';
-      for (let i = 0; i < ship.size; i++) {
-        const c = ship.cells[i];
+      for (let k = 0; k < ship.size; k++) {
         const pip = document.createElement('span');
         pip.className = 'pip';
-        if (c && board.cells[c.row][c.col].hit) pip.classList.add('hit');
+        if (k < found) pip.classList.add('hit');
         pips.appendChild(pip);
       }
+      const blurb = document.createElement('span');
+      blurb.className = 'blurb';
+      blurb.textContent = meta.blurb;
       const stateEl = document.createElement('span');
       stateEl.className = 'ship-state';
-      const hits = ship.cells.filter(c => board.cells[c.row][c.col].hit).length;
-      if (!ship.sunk && hits > 0) li.classList.add('found');
-      stateEl.textContent = ship.sunk ? 'gone' : (hits > 0 ? 'found' : 'in stock');
-      li.append(name, pips, stateEl);
+      stateEl.textContent = ship.sunk ? 'gone' : (found > 0 ? 'found' : (mine ? 'safe' : '?'));
+      li.append(stateEl, art, name, size, pips, blurb);
+      li.title = meta.label;
       list.appendChild(li);
     });
     const acc = shots ? Math.round((hits / shots) * 100) : 0;
     panel.querySelector('.fleet-stats').textContent =
-      `Searches: ${shots} · Found: ${hits} · Hit rate: ${acc}%`;
+      `${shots} searches · ${hits} found · ${acc}%`;
   }
 
   function renderShipCells(board, grid, shipIndex) {
@@ -358,6 +392,9 @@
       cell.style.setProperty('--n', SHIPS[shipIndex].size);
       cell.dataset.glyph = SHIPS[shipIndex].short[0];
       cell.dataset.label = SHIPS[shipIndex].short;
+    }
+    if (!cellAt(grid, ship.cells[0].row, ship.cells[0].col).querySelector('.pkg')) {
+      placePackage(grid, ship, shipIndex);
     }
   }
 
@@ -458,10 +495,13 @@
     const at = B.coord(row, col);
     if (res.result === 'miss') {
       log(`Empty shelf at ${at}`, 'player');
+      say(`${at}. nothing.`, 'you');
     } else if (res.result === 'hit') {
       log(`Found it — ${SHIPS[res.shipIndex].short} at ${at}`, 'player');
+      say(`found it. ${SHIPS[res.shipIndex].short.toLowerCase()} at ${at}`, 'you');
     } else {
       log(`Gone — the roommate's ${SHIPS[res.shipIndex].short}`, 'player');
+      say(`taking the ${SHIPS[res.shipIndex].short.toLowerCase()}. thanks`, 'you');
     }
     state.timeouts.push(setTimeout(() => roommateReact('you', res), 400));
     if (B.allSunk(state.enemyBoard)) {
@@ -487,7 +527,7 @@
 
   function endGame(playerWon) {
     state.phase = 'over';
-    const title = playerWon ? 'Pantry defended.' : 'They got everything.';
+    const title = playerWon ? 'Snacks defended.' : 'They ate everything.';
     setStatus(title);
     log(title, 'info');
     $('overlay-title').textContent = title;
@@ -566,7 +606,7 @@
       const s = SHIPS[state.nextShip];
       setStatus(`Stock your pantry — place the ${s.short} (${s.size} shelves), ${orientationWord()}. Press R to rotate`);
     } else {
-      setStatus('Pantry stocked. Ready?');
+      setStatus('Pantry stocked. Hit “Pantry Stocked” below to start raiding.');
     }
   }
 
@@ -653,6 +693,7 @@
     $('start-btn').addEventListener('click', startGame);
     enemyGrid.addEventListener('click', onEnemyCellClick);
     $('overlay-btn').addEventListener('click', restartGame);
+    $('restart-top').addEventListener('click', restartGame);
     document.addEventListener('keydown', e => {
       if ((e.key === 'r' || e.key === 'R') && state.phase === 'setup') toggleRotate();
     });

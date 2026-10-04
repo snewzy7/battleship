@@ -3,23 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Pantry</title>
+  <title>Snack Attack</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <div class="sign"><span class="sign-aisle">Aisle 1</span><h1>The Pantry</h1></div>
-    <p class="tagline">protect your snacks. raid theirs.</p>
-    <p id="status"></p>
+  <header class="top">
+    <div class="brand">
+      <h1><span class="dash">&#8212;</span> Snack Attack <span class="dash">&#8212;</span></h1>
+      <p class="tagline">protect your snacks from your hungry roommate.</p>
+    </div>
+    <button id="restart-top" class="pill" type="button">Run It Back</button>
   </header>
+  <p id="status"></p>
 
   <main>
     <section class="boards">
-      <div class="board-wrap">
-        <h2 class="shelf-sign"><span>Your Pantry</span><small>stock 5 · defend</small></h2>
+      <div class="board-wrap" id="player-wrap">
+        <div class="board-head">
+          <h2 class="tape">Your Pantry</h2>
+          <div class="controls">
+            <span class="tape note">click to place &middot; R rotates</span>
+            <button id="rotate-btn" type="button">Rotate (H)</button>
+            <button id="random-btn" type="button">Stock randomly</button>
+            <button id="reset-btn" type="button">Clear</button>
+          </div>
+        </div>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="player-col-labels"></div>
@@ -28,7 +39,10 @@
         </div>
       </div>
       <div class="board-wrap">
-        <h2 class="shelf-sign"><span>Roommate's Pantry</span><small>search · take</small></h2>
+        <div class="board-head">
+          <h2 class="tape">Roommate's Pantry</h2>
+          <span class="tape note">click a shelf to search it</span>
+        </div>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="enemy-col-labels"></div>
@@ -38,35 +52,58 @@
       </div>
     </section>
 
-    <aside class="side">
-      <section class="chat" id="chat">
-        <div class="chat-head"><span class="avatar">r</span><span>the roommate</span></div>
-        <ul id="chat-log"></ul>
-      </section>
-      <section class="fleet-panel" id="player-fleet">
-        <h2>Your Pantry</h2>
-        <ul class="fleet-list"></ul>
-        <p class="fleet-stats"></p>
-      </section>
-      <section class="fleet-panel" id="enemy-fleet">
-        <h2>Roommate's Pantry</h2>
-        <ul class="fleet-list"></ul>
-        <p class="fleet-stats"></p>
-      </section>
-      <section class="controls">
-        <h2>Stock Your Pantry</h2>
-        <button id="rotate-btn" type="button">Rotate (H)</button>
-        <button id="random-btn" type="button">Stock randomly</button>
-        <button id="reset-btn" type="button">Clear shelves</button>
-        <button id="start-btn" type="button" hidden>Start</button>
-      </section>
-
-      <section class="log-panel">
-        <h2>what happened</h2>
-        <ul id="log"></ul>
-      </section>
+    <aside class="chat" id="chat">
+      <div class="chat-head">
+        <div class="polaroid">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <rect width="100" height="100" fill="#f3e2d3"/>
+            <circle cx="50" cy="42" r="22" fill="#e9b89a"/>
+            <path d="M28 40 q8 -30 44 -22 q6 10 -2 18 q-20 -6 -42 4z" fill="#3b2a24"/>
+            <circle cx="42" cy="42" r="2.5" fill="#2b1d18"/>
+            <circle cx="58" cy="42" r="2.5" fill="#2b1d18"/>
+            <path d="M44 56 q6 4 12 0" fill="none" stroke="#9c4a3c" stroke-width="2"/>
+            <rect x="52" y="52" width="26" height="14" rx="3" fill="#ef7d1a" transform="rotate(-20 65 59)"/>
+            <path d="M20 100 q30 -40 60 0z" fill="#c9c9d6"/>
+          </svg>
+        </div>
+        <div class="chat-title">
+          <span class="arrow">&#8598;</span>
+          <span>your hungry roommate</span>
+        </div>
+      </div>
+      <ul id="chat-log"></ul>
     </aside>
   </main>
+
+  <section class="strip" id="player-fleet">
+    <div class="strip-head">
+      <h2 class="marker">Your Pantry</h2>
+      <p class="hint">Each snack takes up a set number of shelves. Stock all five, then start raiding.</p>
+    </div>
+    <div class="strip-body">
+      <ul class="fleet-list"></ul>
+      <div class="cta">
+        <button id="start-btn" type="button" hidden>Pantry Stocked &rarr;</button>
+        <p class="fleet-stats"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="strip strip-rm" id="enemy-fleet">
+    <div class="strip-head">
+      <h2 class="marker">Roommate's Pantry</h2>
+      <p class="hint">What you've found over there so far.</p>
+    </div>
+    <div class="strip-body">
+      <ul class="fleet-list"></ul>
+      <div class="cta"><p class="fleet-stats"></p></div>
+    </div>
+  </section>
+
+  <details class="log-panel">
+    <summary>what happened</summary>
+    <ul id="log"></ul>
+  </details>
 
   <div id="flash"></div>
 
@@ -75,12 +112,13 @@
       <h2 id="overlay-title"></h2>
       <p id="overlay-summary"></p>
       <p id="overlay-quote"></p>
-      <button id="overlay-btn" type="button">Run It Back</button>
+      <button id="overlay-btn" class="pill" type="button">Run It Back</button>
     </div>
   </div>
 
   <script src="ai.js"></script>
   <script src="roommate.js"></script>
+  <script src="packages.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
