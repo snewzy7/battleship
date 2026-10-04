@@ -58,7 +58,7 @@ button { font-family: inherit; cursor: pointer; }
 /* ---------- layout ---------- */
 main {
   display: grid;
-  grid-template-columns: auto auto minmax(300px, 1fr);
+  grid-template-columns: minmax(0, auto) minmax(0, auto) minmax(280px, 1fr);
   gap: 1rem;
   padding: 0.25rem 2rem 1rem;
   align-items: stretch;
@@ -122,7 +122,7 @@ main {
 }
 .grid {
   grid-area: 2 / 2; display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px;
-  width: min(34vw, 380px); aspect-ratio: 1 / 1;
+  width: min(26vw, 380px); aspect-ratio: 1 / 1;
 }
 .cell {
   background: var(--cell); border: 1px solid var(--cell-line); border-radius: 3px;
@@ -313,8 +313,16 @@ main {
 #overlay-quote { font-weight: 600; font-size: 1.15rem; color: var(--ink); }
 #overlay-btn { margin-top: 1.1rem; }
 
+@media (max-width: 1400px) {
+  main { grid-template-columns: 1fr 1fr; justify-items: center; }
+  .grid { width: min(36vw, 380px); }
+  .middle { grid-column: 1 / -1; width: 100%; display: grid; grid-template-columns: minmax(260px, 1fr) 2fr; align-items: start; }
+  .speech { margin-top: 0; }
+  #chat-log { max-height: 300px; }
+}
 @media (max-width: 1200px) {
   main { grid-template-columns: 1fr; justify-items: center; }
+  .middle { grid-column: auto; display: flex; }
   .cabinet { width: max-content; }
   .middle { width: 100%; max-width: 760px; }
   .speech { margin-top: 1rem; }
