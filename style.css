@@ -213,12 +213,12 @@ main {
 .speech.bump { animation: bump 0.3s ease-out; }
 
 .chat {
-  position: relative; z-index: 1; flex: none;
+  position: relative; z-index: 1; flex: none; height: 380px; max-height: 380px; min-height: 0; overflow: hidden; box-sizing: border-box;
   background: rgba(255, 250, 242, 0.92); border: 1px solid var(--rule); border-radius: 14px;
   padding: 0.75rem 0.85rem; display: flex; flex-direction: column;
 }
 .chat-head { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
-#chat-log { list-style: none; margin: 0; padding: 0; flex: 1; height: 320px; max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+#chat-log { list-style: none; margin: 0; padding: 0; flex: 1 1 0; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
 #chat-log .bubble { display: flex; flex-direction: column; max-width: 85%; font-size: 1rem; line-height: 1.3; }
 #chat-log .bubble .bubble-text { padding: 0.6rem 0.9rem; border-radius: 14px; background: #fff; border: 1px solid var(--rule); border-bottom-left-radius: 4px; }
 #chat-log .bubble time { font-size: 0.62rem; color: var(--muted); margin: 2px 6px 0; }
@@ -318,11 +318,12 @@ main {
   .grid { width: min(36vw, 380px); }
   .middle { grid-column: 1 / -1; width: 100%; display: grid; grid-template-columns: minmax(260px, 1fr) 2fr; align-items: start; }
   .speech { margin-top: 0; }
-  #chat-log { height: 260px; max-height: 260px; }
+  .chat { height: 300px; max-height: 300px; }
 }
 @media (max-width: 1200px) {
   main { grid-template-columns: 1fr; justify-items: center; }
   .middle { grid-column: auto; display: flex; }
+  .chat { height: 300px; max-height: 300px; }
   .cabinet { width: max-content; }
   .middle { width: 100%; max-width: 760px; }
   .speech { margin-top: 1rem; }
