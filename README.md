@@ -91,6 +91,28 @@ node tests/ai.test.js        # 200 simulated games, placement validation
 node tests/roommate.test.js  # dialogue pool coverage, no immediate repeats
 ```
 
+### Aggressive test passes
+
+Two full passes have been run against the game (see `battleship-bug-report.md`
+in the session for the write-up):
+
+- **Logic stress:** 20,000 simulated AI-vs-fleet games — no repeated shots in
+  either mode, every fleet valid (17 cells, no overlap/out-of-bounds), target
+  mode always fires orthogonally adjacent to a live hit; `placeShip` edge cases
+  (re-placing a ship, corners, every rotation).
+- **Browser/UI (Puppeteer, real clicks + timers):** first-open help card and
+  its `localStorage` persistence, edge/overlap placement rejection, `R` rotate
+  preview refresh, Clear, Stock randomly (exactly 17 cells), rapid-click shot
+  lock, duplicate-shot prevention, fixed-height chat panel, speech card ==
+  latest roommate line, restart mid-AI-turn (all timers cancelled), full games
+  to both endings, end-game overlay + Run It Back, no horizontal overflow at
+  1300 / 1000 / 390 px, zero JS errors.
+
+Bugs found by the second pass (all fixed): the help card could not be closed
+with Escape or by clicking the backdrop; `R` rotated the placement preview
+behind the open help card; the pantry-strip hint text collapsed into a thin
+column on phones.
+
 ## Project structure
 
 ```

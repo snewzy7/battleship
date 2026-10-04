@@ -667,9 +667,14 @@
   function initHelp() {
     const help = $('help');
     $('help-btn').addEventListener('click', () => { help.hidden = false; });
-    $('help-close').addEventListener('click', () => {
+    const close = () => {
       help.hidden = true;
       try { localStorage.setItem('snackattack-seen', '1'); } catch (e) { /* ignore */ }
+    };
+    $('help-close').addEventListener('click', close);
+    help.addEventListener('click', e => { if (e.target === help) close(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && !help.hidden) close();
     });
     let seen = false;
     try { seen = localStorage.getItem('snackattack-seen') === '1'; } catch (e) { /* ignore */ }
@@ -709,7 +714,7 @@
     $('overlay-btn').addEventListener('click', restartGame);
     $('restart-top').addEventListener('click', restartGame);
     document.addEventListener('keydown', e => {
-      if ((e.key === 'r' || e.key === 'R') && state.phase === 'setup') toggleRotate();
+      if ((e.key === 'r' || e.key === 'R') && state.phase === 'setup' && $('help').hidden) toggleRotate();
     });
 
     updateSetupStatus();
