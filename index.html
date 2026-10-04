@@ -35,6 +35,10 @@
     </section>
 
     <aside class="side">
+      <section class="chat" id="chat">
+        <div class="chat-head"><span class="avatar">r</span><span>the roommate</span></div>
+        <ul id="chat-log"></ul>
+      </section>
       <section class="fleet-panel" id="player-fleet">
         <h2>Your Pantry</h2>
         <ul class="fleet-list"></ul>
@@ -66,11 +70,13 @@
     <div class="overlay-card">
       <h2 id="overlay-title"></h2>
       <p id="overlay-summary"></p>
+      <p id="overlay-quote"></p>
       <button id="overlay-btn" type="button">Run It Back</button>
     </div>
   </div>
 
   <script src="ai.js"></script>
+  <script src="roommate.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

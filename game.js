@@ -141,9 +141,12 @@
     stats: { playerShots: 0, playerHits: 0, aiShots: 0, aiHits: 0 },
     timeouts: [],
     hover: null,
+    roommate: null,
+    idleTimer: null,
   };
 
   const $ = id => document.getElementById(id);
+  const chatLog = $('chat-log');
   const statusEl = $('status');
   const playerGrid = $('player-grid');
   const enemyGrid = $('enemy-grid');
@@ -190,6 +193,58 @@
 
   function setStatus(text) {
     statusEl.textContent = text;
+  }
+
+  function say(text) {
+    if (!text) return;
+    const li = document.createElement('li');
+    li.className = 'bubble';
+    li.textContent = text;
+    chatLog.appendChild(li);
+    while (chatLog.children.length > 8) chatLog.firstChild.remove();
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function showTyping() {
+    hideTyping();
+    const li = document.createElement('li');
+    li.className = 'bubble typing';
+    li.id = 'typing-bubble';
+    li.innerHTML = '<span></span><span></span><span></span>';
+    chatLog.appendChild(li);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function hideTyping() {
+    const t = $('typing-bubble');
+    if (t) t.remove();
+  }
+
+  function score() {
+    return {
+      youGone: state.playerBoard.ships.filter(s => s.sunk).length,
+      rmGone: state.enemyBoard.ships.filter(s => s.sunk).length,
+    };
+  }
+
+  function roommateReact(actor, res) {
+    const text = window.Roommate.react(state.roommate, {
+      actor,
+      result: res.result,
+      item: res.shipIndex !== undefined ? SHIPS[res.shipIndex].key : null,
+      score: score(),
+    });
+    if (text) say(text);
+  }
+
+  function scheduleIdle() {
+    if (state.idleTimer) clearTimeout(state.idleTimer);
+    state.idleTimer = setTimeout(() => {
+      if (state.phase === 'play' && !state.aiLock) {
+        say(window.Roommate.line(state.roommate, 'idle'));
+      }
+    }, 15000);
+    state.timeouts.push(state.idleTimer);
   }
 
   function orientationWord() {
@@ -366,6 +421,8 @@
     } else {
       log(`Roommate took your ${SHIPS[res.shipIndex].short}`, 'ai');
     }
+    hideTyping();
+    roommateReact('roommate', res);
     if (B.allSunk(state.playerBoard)) {
       endGame(false);
     }
@@ -390,6 +447,7 @@
     } else {
       log(`Gone — the roommate's ${SHIPS[res.shipIndex].short}`, 'player');
     }
+    state.timeouts.push(setTimeout(() => roommateReact('you', res), 400));
     if (B.allSunk(state.enemyBoard)) {
       endGame(true);
       return;
@@ -397,6 +455,7 @@
     state.aiLock = true;
     enemyGrid.classList.add('locked');
     setStatus('the roommate is looking around…');
+    showTyping();
     const wait = AI_DELAY + (res.result === 'miss' ? 0 : HIT_PAUSE);
     state.timeouts.push(setTimeout(() => {
       aiFire();
@@ -405,6 +464,7 @@
         enemyGrid.classList.remove('locked');
         state.aiLock = false;
         setStatus('Your turn — search the roommate\'s pantry.');
+        scheduleIdle();
       }, POST_AI_DELAY));
     }, wait));
   }
@@ -417,6 +477,9 @@
     $('overlay-title').textContent = title;
     $('overlay-summary').textContent =
       `You searched ${state.stats.playerShots} shelves; the roommate searched ${state.stats.aiShots}.`;
+    const quote = window.Roommate.line(state.roommate, playerWon ? 'you_win' : 'rm_win');
+    say(quote);
+    $('overlay-quote').textContent = quote ? `“${quote}”` : '';
     $('overlay').hidden = false;
   }
 
@@ -442,6 +505,8 @@
     state.nextShip = 0;
     state.aiLock = false;
     state.ai = null;
+    state.roommate = window.Roommate.createRoommate();
+    chatLog.textContent = '';
     state.stats = { playerShots: 0, playerHits: 0, aiShots: 0, aiHits: 0 };
     state.timeouts.forEach(clearTimeout);
     state.timeouts = [];
@@ -471,6 +536,8 @@
     clearPreview();
     setStatus('Your turn — search the roommate\'s pantry.');
     $('controls-title').textContent = 'Command';
+    say(window.Roommate.line(state.roommate, 'start'));
+    scheduleIdle();
     renderFleetPanels();
     log('The pantry is stocked. Let the search begin.', 'info');
   }
@@ -538,6 +605,7 @@
   }
 
   function init() {
+    state.roommate = window.Roommate.createRoommate();
     buildLabels('player-col-labels', 'player-row-labels');
     buildLabels('enemy-col-labels', 'enemy-row-labels');
     buildGrid(playerGrid);
