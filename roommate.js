@@ -5,6 +5,12 @@
 (function (root) {
   // Item keys match Battleship.SHIPS[i].key
   const LINES = {
+    lobby: [
+      "hurry up i'm hungry",
+      "stocking up? cute.",
+      "put the good stuff somewhere obvious pls",
+      "take your time. i'll just wait. hungrily.",
+    ],
     start: [
       "i'm just gonna look around real quick",
       "not stealing anything. just looking.",
