@@ -315,12 +315,12 @@
   function renderFleetPanel(panel, board, shots, hits) {
     const list = panel.querySelector('.fleet-list');
     list.textContent = '';
-    board.ships.forEach(ship => {
+    board.ships.forEach((ship, i) => {
       const li = document.createElement('li');
       if (ship.sunk) li.classList.add('sunk');
       const name = document.createElement('span');
       name.className = 'ship-name';
-      name.textContent = ship.label;
+      name.textContent = SHIPS[i].label;
       const pips = document.createElement('span');
       pips.className = 'pips';
       for (let i = 0; i < ship.size; i++) {
@@ -528,7 +528,10 @@
     $('random-btn').disabled = false;
     $('reset-btn').disabled = false;
     enemyGrid.classList.remove('locked');
-    $('controls-title').textContent = 'Stock Your Pantry';
+    document.querySelector('.controls').hidden = false;
+    state.timeouts.push(setTimeout(() => {
+      say(window.Roommate.line(state.roommate, 'lobby'));
+    }, 600));
     updateSetupStatus();
     renderFleetPanels();
   }
@@ -543,7 +546,7 @@
     $('reset-btn').disabled = true;
     clearPreview();
     setStatus('Your turn — search the roommate\'s pantry.');
-    $('controls-title').textContent = 'Command';
+    document.querySelector('.controls').hidden = true;
     say(window.Roommate.line(state.roommate, 'start'));
     scheduleIdle();
     renderFleetPanels();
@@ -614,6 +617,9 @@
 
   function init() {
     state.roommate = window.Roommate.createRoommate();
+    state.timeouts.push(setTimeout(() => {
+      say(window.Roommate.line(state.roommate, 'lobby'));
+    }, 600));
     buildLabels('player-col-labels', 'player-row-labels');
     buildLabels('enemy-col-labels', 'enemy-row-labels');
     buildGrid(playerGrid);

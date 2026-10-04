@@ -40,12 +40,19 @@ header h1 {
   text-transform: lowercase;
 }
 
+.tagline {
+  margin: 0.3rem 0 0;
+  font-family: 'Fraunces', Georgia, serif;
+  font-style: italic;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
 #status {
-  margin: 0.4rem 0 0;
-  font-size: 0.95rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.85rem;
   min-height: 1.4em;
   color: var(--muted);
-  font-style: italic;
 }
 
 main {
@@ -205,7 +212,7 @@ main {
 @keyframes boom {
   0%   { transform: scale(1); box-shadow: 0 0 0 0 var(--item, var(--accent));
          background: var(--item, var(--accent)); z-index: 2; }
-  40%  { transform: scale(1.6); box-shadow: 0 0 30px 18px var(--item, var(--accent));
+  40%  { transform: scale(1.3); box-shadow: 0 0 10px 6px var(--item, var(--accent));
          background: var(--item, var(--accent)); z-index: 2; }
   100% { transform: scale(1); box-shadow: 0 0 0 30px transparent; }
 }
@@ -292,6 +299,8 @@ main {
   margin: 0;
   padding: 0;
   min-height: 2em;
+  max-height: 260px;
+  overflow-y: auto;
 }
 #chat-log .bubble {
   background: #ebe5dc;
@@ -340,7 +349,7 @@ main {
 
 .fleet-list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.3rem 0;
@@ -348,13 +357,14 @@ main {
 }
 .fleet-list li:last-child { border-bottom: none; }
 
-.fleet-list li .ship-name { flex: 1; font-size: 0.8rem; }
+.fleet-list li .ship-name { flex: 1; font-size: 0.8rem; line-height: 1.2; }
 .fleet-list li.sunk .ship-name {
   text-decoration: line-through;
   color: var(--muted);
 }
 
 .fleet-list li .ship-state {
+  margin-top: 2px;
   font-size: 0.65rem;
   text-transform: lowercase;
   letter-spacing: 0.08em;
@@ -362,7 +372,7 @@ main {
 }
 .fleet-list li.sunk .ship-state { color: var(--muted); }
 
-.pips { display: flex; gap: 3px; }
+.pips { display: flex; gap: 3px; margin-top: 3px; }
 .pip {
   width: 16px;
   height: 5px;
