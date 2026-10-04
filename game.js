@@ -265,9 +265,13 @@
       for (let c = 0; c < SIZE; c++) {
         const cell = cellAt(playerGrid, r, c);
         cell.classList.remove('ship', 'ship-h', 'ship-v', 'ship-bow', 'ship-stern', 'ship-mid');
+        cell.style.removeProperty('--item');
+        delete cell.dataset.glyph;
         const idx = state.playerBoard.cells[r][c].ship;
         if (idx !== null) {
           cell.classList.add(...shipShapeClasses(state.playerBoard.ships[idx], r, c));
+          cell.style.setProperty('--item', SHIPS[idx].color);
+          cell.dataset.glyph = SHIPS[idx].short[0];
         }
       }
     }
@@ -344,6 +348,8 @@
       const cell = cellAt(grid, row, col);
       cell.classList.remove('hit');
       cell.classList.add('sunk', ...shipShapeClasses(ship, row, col));
+      cell.style.setProperty('--item', SHIPS[shipIndex].color);
+      cell.dataset.glyph = SHIPS[shipIndex].short[0];
     }
   }
 
@@ -392,6 +398,8 @@
       removeLater(cell, 'splash', 500);
     } else if (res.result === 'hit') {
       cell.classList.add('hit');
+      cell.style.setProperty('--item', SHIPS[res.shipIndex].color);
+      cell.dataset.glyph = SHIPS[res.shipIndex].short[0];
       boom(cell);
       statusPulse();
     } else {
