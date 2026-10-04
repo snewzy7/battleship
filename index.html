@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Battleship</title>
+  <title>The Pantry</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Battleship</h1>
-    <p id="status">Place your ships to begin.</p>
+    <h1>The Pantry</h1>
+    <p id="status">protect your snacks. raid theirs.</p>
   </header>
 
   <main>
     <section class="boards">
       <div class="board-wrap">
-        <h2>Your Fleet</h2>
+        <h2>Your Pantry</h2>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="player-col-labels"></div>
@@ -24,7 +24,7 @@
         </div>
       </div>
       <div class="board-wrap">
-        <h2>Enemy Waters</h2>
+        <h2>Roommate's Pantry</h2>
         <div class="grid-outer">
           <div class="corner"></div>
           <div class="col-labels" id="enemy-col-labels"></div>
@@ -36,21 +36,21 @@
 
     <aside class="side">
       <section class="fleet-panel" id="player-fleet">
-        <h2>Your Fleet</h2>
+        <h2>Your Pantry</h2>
         <ul class="fleet-list"></ul>
         <p class="fleet-stats"></p>
       </section>
       <section class="fleet-panel" id="enemy-fleet">
-        <h2>Enemy Fleet</h2>
+        <h2>Roommate's Pantry</h2>
         <ul class="fleet-list"></ul>
         <p class="fleet-stats"></p>
       </section>
       <section class="controls">
-        <h2>Command</h2>
+        <h2 id="controls-title">Stock Your Pantry</h2>
         <button id="rotate-btn" type="button">Rotate (H)</button>
-        <button id="random-btn" type="button">Place randomly</button>
-        <button id="reset-btn" type="button">Reset placement</button>
-        <button id="start-btn" type="button" hidden>Start game</button>
+        <button id="random-btn" type="button">Stock randomly</button>
+        <button id="reset-btn" type="button">Clear shelves</button>
+        <button id="start-btn" type="button" hidden>Start</button>
       </section>
 
       <section class="log-panel">
@@ -66,7 +66,7 @@
     <div class="overlay-card">
       <h2 id="overlay-title"></h2>
       <p id="overlay-summary"></p>
-      <button id="overlay-btn" type="button">Play again</button>
+      <button id="overlay-btn" type="button">Run It Back</button>
     </div>
   </div>
 

@@ -5,11 +5,11 @@
   const COLS = 'ABCDEFGHIJ';
 
   const SHIPS = [
-    { name: 'Carrier', size: 5 },
-    { name: 'Battleship', size: 4 },
-    { name: 'Cruiser', size: 3 },
-    { name: 'Submarine', size: 3 },
-    { name: 'Destroyer', size: 2 },
+    { name: 'Carrier', size: 5, key: 'buldak', label: 'Buldak Spicy Carbonara Ramen', short: 'Buldak', color: '#e23b5a' },
+    { name: 'Battleship', size: 4, key: 'takis', label: "Trader Joe's Chili & Lime Rolled Corn Tortilla Chips", short: "TJ's Takis", color: '#f0742a' },
+    { name: 'Cruiser', size: 3, key: 'cfa', label: 'Chick-fil-A Sauce', short: 'Chick-fil-A Sauce', color: '#d84a2b' },
+    { name: 'Submarine', size: 3, key: 'pbcups', label: 'Peanut Butter Cups', short: 'PB Cups', color: '#b5651d' },
+    { name: 'Destroyer', size: 2, key: 'poppi', label: 'Raspberry Rose Poppi', short: 'Poppi', color: '#e05a9c' },
   ];
 
   function createBoard() {
@@ -261,7 +261,7 @@
       if (ship.sunk) li.classList.add('sunk');
       const name = document.createElement('span');
       name.className = 'ship-name';
-      name.textContent = ship.name;
+      name.textContent = ship.label;
       const pips = document.createElement('span');
       pips.className = 'pips';
       for (let i = 0; i < ship.size; i++) {
@@ -273,13 +273,14 @@
       }
       const stateEl = document.createElement('span');
       stateEl.className = 'ship-state';
-      stateEl.textContent = ship.sunk ? 'Sunk' : 'Afloat';
+      const hits = ship.cells.filter(c => board.cells[c.row][c.col].hit).length;
+      stateEl.textContent = ship.sunk ? 'gone' : (hits > 0 ? 'found' : 'on the shelf');
       li.append(name, pips, stateEl);
       list.appendChild(li);
     });
     const acc = shots ? Math.round((hits / shots) * 100) : 0;
     panel.querySelector('.fleet-stats').textContent =
-      `Shots: ${shots} · Hits: ${hits} · Accuracy: ${acc}%`;
+      `Searches: ${shots} · Found: ${hits} · Hit rate: ${acc}%`;
   }
 
   function renderShipCells(board, grid, shipIndex) {
@@ -359,11 +360,11 @@
     renderFleetPanels();
     const at = B.coord(row, col);
     if (res.result === 'miss') {
-      log(`The AI missed at ${at}`, 'ai');
+      log(`Roommate: empty shelf at ${at}`, 'ai');
     } else if (res.result === 'hit') {
-      log(`The AI hit your ${res.shipName} at ${at}`, 'ai');
+      log(`Roommate found your ${SHIPS[res.shipIndex].short} at ${at}`, 'ai');
     } else {
-      log(`The AI sank your ${res.shipName}!`, 'ai');
+      log(`Roommate took your ${SHIPS[res.shipIndex].short}`, 'ai');
     }
     if (B.allSunk(state.playerBoard)) {
       endGame(false);
@@ -383,11 +384,11 @@
     renderFleetPanels();
     const at = B.coord(row, col);
     if (res.result === 'miss') {
-      log(`You missed at ${at}`, 'player');
+      log(`Empty shelf at ${at}`, 'player');
     } else if (res.result === 'hit') {
-      log(`You hit the ${res.shipName} at ${at}`, 'player');
+      log(`Found it — ${SHIPS[res.shipIndex].short} at ${at}`, 'player');
     } else {
-      log(`You sank the AI's ${res.shipName}!`, 'player');
+      log(`Gone — the roommate's ${SHIPS[res.shipIndex].short}`, 'player');
     }
     if (B.allSunk(state.enemyBoard)) {
       endGame(true);
@@ -395,7 +396,7 @@
     }
     state.aiLock = true;
     enemyGrid.classList.add('locked');
-    setStatus('Enemy shot incoming…');
+    setStatus('the roommate is looking around…');
     const wait = AI_DELAY + (res.result === 'miss' ? 0 : HIT_PAUSE);
     state.timeouts.push(setTimeout(() => {
       aiFire();
@@ -403,18 +404,19 @@
       state.timeouts.push(setTimeout(() => {
         enemyGrid.classList.remove('locked');
         state.aiLock = false;
-        setStatus('Your turn — fire at Enemy Waters.');
+        setStatus('Your turn — search the roommate\'s pantry.');
       }, POST_AI_DELAY));
     }, wait));
   }
 
   function endGame(playerWon) {
     state.phase = 'over';
-    setStatus(playerWon ? 'You win!' : 'The AI wins!');
-    log(playerWon ? 'You win!' : 'The AI wins!', 'info');
-    $('overlay-title').textContent = playerWon ? 'You win!' : 'The AI wins!';
+    const title = playerWon ? 'Pantry defended.' : 'They got everything.';
+    setStatus(title);
+    log(title, 'info');
+    $('overlay-title').textContent = title;
     $('overlay-summary').textContent =
-      `You fired ${state.stats.playerShots} shots; the AI fired ${state.stats.aiShots}.`;
+      `You searched ${state.stats.playerShots} shelves; the roommate searched ${state.stats.aiShots}.`;
     $('overlay').hidden = false;
   }
 
@@ -453,6 +455,7 @@
     $('random-btn').disabled = false;
     $('reset-btn').disabled = false;
     enemyGrid.classList.remove('locked');
+    $('controls-title').textContent = 'Stock Your Pantry';
     updateSetupStatus();
     renderFleetPanels();
   }
@@ -466,25 +469,28 @@
     $('random-btn').disabled = true;
     $('reset-btn').disabled = true;
     clearPreview();
-    setStatus('Your turn — fire at Enemy Waters.');
+    setStatus('Your turn — search the roommate\'s pantry.');
+    $('controls-title').textContent = 'Command';
     renderFleetPanels();
-    log('Game started. Good luck!', 'info');
+    log('The pantry is stocked. Let the search begin.', 'info');
   }
 
   function updateSetupStatus() {
     if (state.nextShip < SHIPS.length) {
-      setStatus(`Place your ${SHIPS[state.nextShip].name} (${SHIPS[state.nextShip].size} cells) — ${orientationWord()}, press R to rotate`);
+      const s = SHIPS[state.nextShip];
+      setStatus(`Stock your pantry — place the ${s.short} (${s.size} shelves), ${orientationWord()}. Press R to rotate`);
     } else {
-      setStatus('All ships placed. Start the game!');
+      setStatus('Pantry stocked. Ready?');
     }
   }
 
   function failPlacement(row, col, check) {
-    const name = SHIPS[state.nextShip].name;
+    const name = SHIPS[state.nextShip].short;
     const at = B.coord(row, col);
+    const other = SHIPS.find(s => s.name === check.overlapName);
     const msg = check.reason === 'edge'
-      ? `Can't place ${name} at ${at} ${orientationWord()}: it would extend past the edge`
-      : `Can't place ${name} at ${at} ${orientationWord()}: it overlaps the ${check.overlapName}`;
+      ? `Can't put the ${name} at ${at} ${orientationWord()} — it runs off the shelf`
+      : `Can't put the ${name} at ${at} ${orientationWord()} — it overlaps the ${other ? other.short : check.overlapName}`;
     setStatus(msg);
     log(msg, 'info');
   }
@@ -499,7 +505,7 @@
       failPlacement(row, col, res);
       return;
     }
-    log(`Placed ${SHIPS[state.nextShip].name} at ${B.coord(row, col)}`, 'info');
+    log(`Stocked the ${SHIPS[state.nextShip].short} at ${B.coord(row, col)}`, 'info');
     state.nextShip++;
     renderPlayerBoard();
     clearPreview();
@@ -551,7 +557,7 @@
       clearPreview();
       updateSetupStatus();
       $('start-btn').hidden = false;
-      log('Fleet placed randomly.', 'info');
+      log('Pantry stocked randomly.', 'info');
     });
     $('reset-btn').addEventListener('click', resetPlacement);
     $('start-btn').addEventListener('click', startGame);
