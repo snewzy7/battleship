@@ -145,6 +145,7 @@ main {
 }
 .cell.ship.sunk { background: #c9c2b7; border-color: #a9a299; }
 .cell.ship.sunk .pkg { filter: grayscale(1) opacity(0.5); }
+#enemy-grid .cell.hit { background: #ffd98a; border-color: #e09a2b; box-shadow: inset 0 0 0 1px #fff3cf; }
 
 .cell.preview-valid { background: var(--valid); }
 .cell.preview-invalid { background: var(--invalid); }

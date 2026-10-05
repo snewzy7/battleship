@@ -111,7 +111,10 @@ in the session for the write-up):
 Bugs found by the second pass (all fixed): the help card could not be closed
 with Escape or by clicking the backdrop; `R` rotated the placement preview
 behind the open help card; the pantry-strip hint text collapsed into a thin
-column on phones.
+column on phones. A follow-up report from a real phone game: a found-but-not-yet-gone
+square on the roommate's board showed only the red X on an unchanged cream tile, so
+it didn't read as "lit up" — found squares now get an amber tile, distinct from the
+grey tile of an item that's fully gone.
 
 ## Project structure
 

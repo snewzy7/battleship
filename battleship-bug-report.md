@@ -140,3 +140,13 @@ No logic, scoring, turn-order, or state-reset bugs. Three low-severity UI bugs:
 
 ### Known limitation
 - The browser requests `/favicon.ico`, which 404s (no icon shipped). Cosmetic.
+
+### Follow-up from your phone play-through
+> i just played and I think I found a bug. It didn't light up when I got the 2 x
+
+Reproduced in a headless browser: on the roommate's board a **found** square
+(item not yet fully taken) kept the plain cream tile and only drew the red X —
+the grey "gone" tile appears only once every square of that item is found.
+Mechanically the hit was counted (confirmed via cell state), but visually it
+didn't light up. Fix: `#enemy-grid .cell.hit` now gets an amber tile
+(`#ffd98a`, orange border), so found = amber + X, gone = grey + X, empty = dot.
