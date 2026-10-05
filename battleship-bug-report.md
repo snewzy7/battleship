@@ -150,3 +150,13 @@ the grey "gone" tile appears only once every square of that item is found.
 Mechanically the hit was counted (confirmed via cell state), but visually it
 didn't light up. Fix: `#enemy-grid .cell.hit` now gets an amber tile
 (`#ffd98a`, orange border), so found = amber + X, gone = grey + X, empty = dot.
+
+### Follow-up: speech card resizing
+> can this be a fixed height?
+
+The roommate's speech card (big line + status pill) grew and shrank with each
+message, nudging the chat panel below it. Fix: `.speech` is now a fixed 240px
+flex column — the roommate's line is centered in the top area and the status
+pill is pinned to the bottom; both are clipped if they ever overflow. Verified
+in a headless browser at 1600px and 390px with short, normal, and very long
+lines: card height stays 240px in every case.
